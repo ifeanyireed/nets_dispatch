@@ -98,8 +98,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       height: 56,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                        ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(color: AppTheme.primaryRed.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8)),

@@ -497,8 +497,12 @@ class _RiderMatchScreenState extends State<RiderMatchScreen> {
                   height: 56,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                    ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(

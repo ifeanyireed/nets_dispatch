@@ -229,7 +229,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd]),
+                        gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                         borderRadius: BorderRadius.circular(100),
                         boxShadow: [BoxShadow(color: AppTheme.primaryRed.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8))],
                       ),
@@ -391,8 +397,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                    ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(

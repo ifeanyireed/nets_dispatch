@@ -256,8 +256,12 @@ class _CreateMeetupScreenState extends State<CreateMeetupScreen> with SingleTick
                       height: 48,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                        ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Center(

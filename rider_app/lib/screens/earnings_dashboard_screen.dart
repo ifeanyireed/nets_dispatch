@@ -283,10 +283,12 @@ class _EarningsDashboardScreenState extends State<EarningsDashboardScreen> with 
           height: 80 * (heightPercent / 100),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-            ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
             borderRadius: BorderRadius.circular(4),
           ),
         ),

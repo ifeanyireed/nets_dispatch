@@ -56,10 +56,10 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'NETS Logistics',
+                        'NETS Dispatch',
                         style: TextStyle(fontFamily: 'Inter', 
                           fontSize: 22,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
                       ),
@@ -72,7 +72,7 @@ class WelcomeScreen extends StatelessWidget {
                     'Direct Logistics\nBooking',
                     style: TextStyle(fontFamily: 'Inter', 
                       fontSize: 40,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                       height: 1.15,
                     ),
@@ -100,8 +100,12 @@ class WelcomeScreen extends StatelessWidget {
                       height: 56,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                        ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(

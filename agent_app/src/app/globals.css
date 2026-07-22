@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #050505;
+  --color-ink-2: #0a0a0a;
+  --color-panel: rgba(18, 18, 18, 0.65);
+  --color-panel-2: rgba(26, 26, 26, 0.65);
+  --color-panel-3: rgba(34, 34, 34, 0.65);
+  
+  --color-text-0: #f3f5fb;
+  --color-text-1: #aab2cc;
+  --color-text-2: #6d7593;
+  
+  --color-hazard: #ef4444;
+  --color-hazard-ink: #ffffff;
+  --color-live: #2fd484;
+  --color-alert: #fb5b4e;
+  --color-sky: #3aa9f0;
+  
+  --color-hairline: rgba(255, 255, 255, 0.09);
+  --color-hairline-2: rgba(255, 255, 255, 0.15);
+}
+
+@layer base {
+  body {
+    @apply bg-ink text-text-0 font-sans antialiased;
+  }
+}
+
+@layer components {
+  .input-pill {
+    @apply w-full bg-transparent border border-[#333333] text-text-0 placeholder-text-2 px-6 py-3.5 rounded-full focus:outline-none focus:border-hazard focus:ring-1 focus:ring-hazard transition-colors;
+  }
+  
+  .btn-primary {
+    @apply w-full bg-gradient-to-r from-[#7a0000] via-[#ff2a2a] to-[#7a0000] text-white font-semibold px-6 py-3.5 rounded-full hover:opacity-90 shadow-[0_4px_15px_rgba(255,42,42,0.2)] transition-all flex items-center justify-center;
+  }
+}
+
+@keyframes tickerMove {
+  0% { transform: translateX(100vw); }
+  100% { transform: translateX(-100%); }
+}

@@ -191,8 +191,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   height: 52,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                    ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                     borderRadius: BorderRadius.circular(26),
                   ),
                   child: Center(

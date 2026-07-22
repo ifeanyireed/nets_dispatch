@@ -329,9 +329,13 @@ class _ChatScreenState extends State<ChatScreen> {
                       width: 40,
                       height: 40,
                       decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                        ),
+                        gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                         shape: BoxShape.circle,
                       ),
                       child: const Center(

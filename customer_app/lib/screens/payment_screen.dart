@@ -123,8 +123,12 @@ class PaymentScreen extends StatelessWidget {
                       height: 56,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [AppTheme.redGradientStart, AppTheme.redGradientEnd],
-                        ),
+                                      colors: [
+                                        Color(0xFF7A0000),
+                                        Color(0xFFFF2A2A),
+                                        Color(0xFF7A0000),
+                                      ],
+                                    ),
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
