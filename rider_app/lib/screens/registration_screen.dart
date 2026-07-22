@@ -1,5 +1,7 @@
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../theme/app_theme.dart';
 import 'verification_status_screen.dart';
 
@@ -19,6 +21,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _plateController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -38,18 +43,81 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
     _phoneController.dispose();
     _emailController.dispose();
     _plateController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleContinue() {
+  Future<void> _handleContinue() async {
     if (_activeTabIndex < 2) {
       _tabController.animateTo(_activeTabIndex + 1);
     } else {
-      // Completed last tab: navigate to Verification Status Screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const VerificationStatusScreen()),
-      );
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      if (name.isEmpty || email.isEmpty || password.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppTheme.primaryRed,
+            content: const Text('Please fill out all required personal details'),
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final response = await http.post(
+          Uri.parse('http://localhost:8080/auth/register'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'name': name,
+            'email': email,
+            'password': password,
+            'role': 'rider'
+          }),
+        );
+
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          if (response.statusCode == 200 || response.statusCode == 201) {
+             ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                backgroundColor: Colors.green,
+                content: Text('Registration successful'),
+              ),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const VerificationStatusScreen()),
+            );
+          } else {
+             ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: AppTheme.primaryRed,
+                content: Text('Registration failed: ${response.body}'),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppTheme.primaryRed,
+              content: Text('Network error: $e'),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -162,15 +230,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
                         ],
                       ),
                       child: Center(
-                        child: Text(
-                          _activeTabIndex == 2 ? 'SUBMIT APPLICATION' : 'CONTINUE',
-                          style: TextStyle(fontFamily: 'Inter', 
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
+                        child: _isLoading 
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                            )
+                          : Text(
+                              _activeTabIndex == 2 ? 'SUBMIT APPLICATION' : 'CONTINUE',
+                              style: TextStyle(fontFamily: 'Inter', 
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
                       ),
                     ),
                   ),
@@ -218,6 +292,40 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           
           _buildFieldLabel('Email Address'),
           _buildTextField(_emailController, 'e.g. ade@netlogistics.ng', TablerIcons.mail),
+          const SizedBox(height: 18),
+          
+          _buildFieldLabel('Password'),
+          Container(
+            decoration: BoxDecoration(
+              color: AppTheme.inputBackground,
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(color: Colors.white.withOpacity(0.04)),
+            ),
+            child: TextField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              style: const TextStyle(fontFamily: 'Inter', color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Password',
+                hintStyle: TextStyle(fontFamily: 'Inter', color: AppTheme.textMuted, fontSize: 13),
+                prefixIcon: const Icon(TablerIcons.lock, color: AppTheme.textSecondary, size: 20),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? TablerIcons.eye_off : TablerIcons.eye,
+                    color: AppTheme.textSecondary,
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              ),
+            ),
+          ),
           const SizedBox(height: 18),
         ],
       ),

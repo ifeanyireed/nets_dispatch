@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme.dart';
@@ -13,13 +15,86 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRegister() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppTheme.primaryRed,
+          content: Text(
+            'Please fill all required fields',
+            style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          'role': 'vendor',
+          'name': name,
+        }),
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppTheme.primaryRed,
+            content: Text(
+              'Registration failed: ${response.body}',
+              style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppTheme.primaryRed,
+          content: Text(
+            'Error: $e',
+            style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -85,6 +160,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         
                         _buildFieldLabel('Email Address'),
                         _buildTextField(_emailController, 'e.g. ade@netlogistics.ng', TablerIcons.mail, TextInputType.emailAddress),
+                        const SizedBox(height: 18),
+                        
+                        _buildFieldLabel('Password'),
+                        _buildPasswordField(),
                       ],
                     ),
                   ),
@@ -92,7 +171,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
                   child: GestureDetector(
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false),
+                    onTap: _isLoading ? null : _handleRegister,
                     child: Container(
                       width: double.infinity,
                       height: 56,
@@ -110,12 +189,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         ],
                       ),
                       child: Center(
-                        child: Text(
-                          'CREATE ACCOUNT',
-                          style: TextStyle(fontFamily: 'Inter', 
-                            fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 1.5,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : Text(
+                                'CREATE ACCOUNT',
+                                style: TextStyle(fontFamily: 'Inter', 
+                                  fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 1.5,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -157,6 +245,40 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           hintText: hint,
           hintStyle: TextStyle(fontFamily: 'Inter', color: AppTheme.textMuted, fontSize: 13),
           prefixIcon: Icon(icon, color: AppTheme.textSecondary, size: 20),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.inputBackground,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: Colors.white.withOpacity(0.04)),
+      ),
+      child: TextField(
+        controller: _passwordController,
+        obscureText: _obscurePassword,
+        style: TextStyle(fontFamily: 'Inter', color: Colors.white),
+        decoration: InputDecoration(
+          hintText: 'Password',
+          hintStyle: TextStyle(fontFamily: 'Inter', color: AppTheme.textMuted, fontSize: 13),
+          prefixIcon: Icon(TablerIcons.lock, color: AppTheme.textSecondary, size: 20),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscurePassword ? TablerIcons.eye_off : TablerIcons.eye,
+              color: AppTheme.textSecondary,
+              size: 20,
+            ),
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),

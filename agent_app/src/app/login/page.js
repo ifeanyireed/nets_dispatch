@@ -1,7 +1,45 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to login");
+      }
+      
+      localStorage.setItem("token", data.token);
+      if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.profile) localStorage.setItem("profile", JSON.stringify(data.profile));
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen w-full flex bg-black relative overflow-hidden font-sans">
       {/* Background motorbiker illustration/gradient overlay */}
@@ -38,7 +76,9 @@ export default function Login() {
             In flutter it uses Spacer(flex: 3). We'll use a flex-1 spacer. */}
         <div className="flex-[0.5]" />
 
-        <form className="flex flex-col mt-10">
+        <form className="flex flex-col mt-10" onSubmit={handleLogin}>
+          {error && <div className="text-red-500 mb-4 text-sm font-semibold">{error}</div>}
+          
           {/* Email Input */}
           <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
             Email Address
@@ -47,6 +87,8 @@ export default function Login() {
             <svg className="w-5 h-5 text-[#a5a1a1] mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect><polyline points="3 7 12 13 21 7"></polyline></svg>
             <input 
               type="text" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0" 
               placeholder="Email address" 
             />
@@ -60,16 +102,15 @@ export default function Login() {
             <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             <input 
               type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0 pr-10" 
               placeholder="Password" 
             />
-            <button type="button" className="absolute right-4 text-[#a5a1a1]">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
           </div>
 
           <div className="flex items-center justify-start mb-8">
-            <Link href="/reset-password" className="text-[11px] font-bold text-[#a5a1a1] tracking-[0.5px] uppercase hover:text-white transition-colors">
+            <Link href="/forgot-password" className="text-[11px] font-bold text-[#a5a1a1] tracking-[0.5px] uppercase hover:text-white transition-colors">
               FORGOT PASSWORD?
             </Link>
           </div>
@@ -77,11 +118,11 @@ export default function Login() {
           <div className="flex-1" />
 
           {/* Login Button */}
-          <Link href="/dashboard" className="w-full h-14 bg-gradient-to-r from-[#7a0000] via-[#ff2a2a] to-[#7a0000] rounded-full shadow-[0_8px_16px_rgba(255,42,42,0.3)] flex items-center justify-center transition-opacity hover:opacity-90 mt-8 mb-6">
+          <button type="submit" disabled={loading} className="w-full h-14 bg-gradient-to-r from-[#7a0000] via-[#ff2a2a] to-[#7a0000] rounded-full shadow-[0_8px_16px_rgba(255,42,42,0.3)] flex items-center justify-center transition-opacity hover:opacity-90 mt-8 mb-6 disabled:opacity-50">
             <span className="text-white font-extrabold text-[15px] tracking-[1.5px] uppercase">
-              Log In
+              {loading ? "Logging In..." : "Log In"}
             </span>
-          </Link>
+          </button>
         </form>
       </div>
     </main>

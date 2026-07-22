@@ -1,8 +1,11 @@
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../theme/app_theme.dart';
 import 'main_navigation_screen.dart';
 import 'registration_screen.dart';
+import 'forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -25,29 +28,16 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppTheme.primaryRed,
-          content: Text(
-            'Please enter your email address',
-            style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
-      );
-      return;
-    }
-
-    if (password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: AppTheme.primaryRed,
-          content: Text(
-            'Please enter your password',
+          content: const Text(
+            'Please enter your email and password',
             style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
@@ -59,18 +49,51 @@ class _SignInScreenState extends State<SignInScreen> {
       _isLoading = true;
     });
 
-    // Simulate auth check delay
-    Future.delayed(const Duration(milliseconds: 800), () {
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.green,
+              content: Text('Login successful'),
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppTheme.primaryRed,
+              content: Text('Login failed: ${response.body}'),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppTheme.primaryRed,
+            content: Text('Network error: $e'),
+          ),
         );
       }
-    });
+    }
   }
 
   @override
@@ -257,7 +280,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             Align(
                               alignment: Alignment.centerLeft,
                               child: TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()));
+                                },
                                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                                 child: Text(
                                   'FORGOT PASSWORD?',

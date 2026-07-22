@@ -1,5 +1,109 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+function ResetPasswordForm() {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!token) {
+      setError("No reset token provided in the URL.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:8080/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, newPassword }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to reset password");
+      }
+      
+      setMessage("Password successfully reset. You can now login.");
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form className="flex flex-col mt-10" onSubmit={handleReset}>
+      {error && <div className="text-red-500 mb-4 text-sm font-semibold">{error}</div>}
+      {message && <div className="text-green-500 mb-4 text-sm font-semibold">{message}</div>}
+      
+      <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
+        New Password
+      </label>
+      <div className="bg-[#282525] rounded-full border border-white/5 flex items-center mb-5 px-4 py-3.5 relative">
+        <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <input 
+          type="password" 
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0 pr-10" 
+          placeholder="New password" 
+        />
+      </div>
+
+      <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
+        Confirm Password
+      </label>
+      <div className="bg-[#282525] rounded-full border border-white/5 flex items-center mb-3 px-4 py-3.5 relative">
+        <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <input 
+          type="password" 
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0 pr-10" 
+          placeholder="Confirm password" 
+        />
+      </div>
+
+      <div className="flex items-center justify-start mb-6 mt-2">
+        <p className="text-[12px] font-medium text-[#a5a1a1]">
+          <Link href="/login" className="text-white hover:text-hazard transition-colors font-bold uppercase tracking-[0.5px] text-[11px]">Back to Log in</Link>
+        </p>
+      </div>
+
+      <div className="flex-1" />
+
+      <button type="submit" disabled={loading} className="w-full h-14 bg-gradient-to-r from-[#7a0000] via-[#ff2a2a] to-[#7a0000] rounded-full shadow-[0_8px_16px_rgba(255,42,42,0.3)] flex items-center justify-center transition-opacity hover:opacity-90 mt-4 mb-6 disabled:opacity-50">
+        <span className="text-white font-extrabold text-[15px] tracking-[1.5px] uppercase">
+          {loading ? "Resetting..." : "Reset Password"}
+        </span>
+      </button>
+    </form>
+  );
+}
 
 export default function ResetPassword() {
   return (
@@ -35,69 +139,9 @@ export default function ResetPassword() {
 
         <div className="flex-[0.5]" />
 
-        <form className="flex flex-col mt-10">
-          <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
-            Email or Phone
-          </label>
-          <div className="bg-[#282525] rounded-full border border-white/5 flex items-center mb-5 px-4 py-3.5">
-            <svg className="w-5 h-5 text-[#a5a1a1] mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect><polyline points="3 7 12 13 21 7"></polyline></svg>
-            <input 
-              type="text" 
-              className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0" 
-              placeholder="Email or phone" 
-            />
-          </div>
-
-          <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
-            Verification Code
-          </label>
-          <div className="bg-[#282525] rounded-full border border-white/5 flex items-center mb-5 px-4 py-3.5">
-            <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            <input 
-              type="text" 
-              className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0" 
-              placeholder="Verification code" 
-            />
-          </div>
-          
-          <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
-            New Password
-          </label>
-          <div className="bg-[#282525] rounded-full border border-white/5 flex items-center mb-5 px-4 py-3.5 relative">
-            <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <input 
-              type="password" 
-              className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0 pr-10" 
-              placeholder="New password" 
-            />
-          </div>
-
-          <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
-            Confirm Password
-          </label>
-          <div className="bg-[#282525] rounded-full border border-white/5 flex items-center mb-3 px-4 py-3.5 relative">
-            <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-            <input 
-              type="password" 
-              className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0 pr-10" 
-              placeholder="Confirm password" 
-            />
-          </div>
-
-          <div className="flex items-center justify-start mb-6 mt-2">
-            <p className="text-[12px] font-medium text-[#a5a1a1]">
-              <Link href="/login" className="text-white hover:text-hazard transition-colors font-bold uppercase tracking-[0.5px] text-[11px]">Back to Log in</Link>
-            </p>
-          </div>
-
-          <div className="flex-1" />
-
-          <Link href="/login" className="w-full h-14 bg-gradient-to-r from-[#7a0000] via-[#ff2a2a] to-[#7a0000] rounded-full shadow-[0_8px_16px_rgba(255,42,42,0.3)] flex items-center justify-center transition-opacity hover:opacity-90 mt-4 mb-6">
-            <span className="text-white font-extrabold text-[15px] tracking-[1.5px] uppercase">
-              Reset Password
-            </span>
-          </Link>
-        </form>
+        <Suspense fallback={<div className="text-white mt-10">Loading...</div>}>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </main>
   );

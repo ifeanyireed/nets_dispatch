@@ -88,7 +88,7 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         {/* Footer */}
-        <div className="mt-auto pt-4 border-t border-hairline font-sans tracking-wide text-sm text-text-2 leading-relaxed">
+        <Link href="/profile" className="mt-auto pt-4 border-t border-hairline font-sans tracking-wide text-sm text-text-2 leading-relaxed block hover:bg-panel transition-colors rounded-xl px-2 py-2">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-6 h-6 rounded-full bg-panel border border-hairline-2 flex items-center justify-center text-text-0 font-bold">AO</div>
             <div className="flex flex-col">
@@ -97,7 +97,7 @@ export default function DashboardLayout({ children }) {
             </div>
           </div>
           <div>Agent Session <span className="text-live">● Active</span></div>
-        </div>
+        </Link>
       </aside>
 
       {/* Main Content */}

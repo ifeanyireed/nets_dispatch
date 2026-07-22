@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme.dart';
@@ -23,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -57,15 +59,46 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    // Simulate auth check delay
-    Future.delayed(const Duration(milliseconds: 800), () {
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppTheme.primaryRed,
+            content: Text(
+              'Login failed: ${response.body}',
+              style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppTheme.primaryRed,
+          content: Text(
+            'Error: $e',
+            style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    } finally {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        Navigator.pushReplacementNamed(context, '/home');
       }
-    });
+    }
   }
 
   @override
@@ -251,16 +284,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             // Forgot Password
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                                child: Text(
-                                  'FORGOT PASSWORD?',
-                                  style: TextStyle(fontFamily: 'Inter', 
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppTheme.textSecondary,
-                                    letterSpacing: 0.5,
+                              child: GestureDetector(
+                                onTap: () => Navigator.pushNamed(context, '/forgot_password'),
+                                behavior: HitTestBehavior.opaque,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                    'FORGOT PASSWORD?',
+                                    style: TextStyle(fontFamily: 'Inter', 
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.textSecondary,
+                                      letterSpacing: 0.5,
+                                    ),
                                   ),
                                 ),
                               ),

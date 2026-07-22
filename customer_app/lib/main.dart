@@ -11,6 +11,9 @@ import 'screens/tracking_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/chat_screen.dart';
+import 'screens/forgot_password_screen.dart';
+import 'screens/reset_password_screen.dart';
+
 void main() {
   runApp(const CustomerApp());
 }
@@ -37,6 +40,8 @@ class CustomerApp extends StatelessWidget {
         '/history': (context) => const HistoryScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/chat': (context) => const ChatScreen(),
+        '/forgot_password': (context) => const ForgotPasswordScreen(),
+        '/reset_password': (context) => const ResetPasswordScreen(),
       },
     );
   }

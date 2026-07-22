@@ -1,7 +1,43 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:8080/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, role: "agent", name }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to register");
+      }
+      
+      router.push("/login");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen w-full flex bg-black relative overflow-hidden font-sans">
       {/* Background motorbiker illustration/gradient overlay */}
@@ -35,7 +71,9 @@ export default function Register() {
 
         <div className="flex-[0.5]" />
 
-        <form className="flex flex-col mt-10">
+        <form className="flex flex-col mt-10" onSubmit={handleRegister}>
+          {error && <div className="text-red-500 mb-4 text-sm font-semibold">{error}</div>}
+          
           <label className="text-[12px] font-bold text-[#a5a1a1] mb-2 block">
             Full Name
           </label>
@@ -43,6 +81,8 @@ export default function Register() {
             <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             <input 
               type="text" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0" 
               placeholder="John Doe" 
             />
@@ -55,6 +95,8 @@ export default function Register() {
             <svg className="w-5 h-5 text-[#a5a1a1] mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect><polyline points="3 7 12 13 21 7"></polyline></svg>
             <input 
               type="text" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0" 
               placeholder="Email address" 
             />
@@ -67,12 +109,11 @@ export default function Register() {
             <svg className="w-5 h-5 text-[#a5a1a1] mr-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             <input 
               type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-transparent border-none text-white placeholder-[#706B6B] text-[14px] w-full focus:outline-none focus:ring-0 pr-10" 
               placeholder="Password" 
             />
-            <button type="button" className="absolute right-4 text-[#a5a1a1]">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
           </div>
 
           <div className="flex items-center justify-start mb-6 mt-2">
@@ -83,11 +124,11 @@ export default function Register() {
 
           <div className="flex-1" />
 
-          <Link href="/login" className="w-full h-14 bg-gradient-to-r from-[#7a0000] via-[#ff2a2a] to-[#7a0000] rounded-full shadow-[0_8px_16px_rgba(255,42,42,0.3)] flex items-center justify-center transition-opacity hover:opacity-90 mt-4 mb-6">
+          <button type="submit" disabled={loading} className="w-full h-14 bg-gradient-to-r from-[#7a0000] via-[#ff2a2a] to-[#7a0000] rounded-full shadow-[0_8px_16px_rgba(255,42,42,0.3)] flex items-center justify-center transition-opacity hover:opacity-90 mt-4 mb-6 disabled:opacity-50">
             <span className="text-white font-extrabold text-[15px] tracking-[1.5px] uppercase">
-              Register
+              {loading ? "Registering..." : "Register"}
             </span>
-          </Link>
+          </button>
         </form>
       </div>
     </main>
