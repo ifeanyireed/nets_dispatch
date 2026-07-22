@@ -192,14 +192,14 @@ func ForgotPassword(c *gin.Context) {
 	})
 	tokenString, _ := token.SignedString([]byte(secret))
 
-	resetLink := fmt.Sprintf("https://resultspro.ng/reset-password?token=%s", tokenString)
+	resetLink := fmt.Sprintf("https://netslogistics.com/reset-password?token=%s", tokenString)
 	htmlBody := fmt.Sprintf("<h2>Password Reset</h2><p>Click <a href='%s'>here</a> to reset your password. This link expires in 30 minutes.</p>", resetLink)
 
 	// Call email proxy
 	proxyReq := map[string]string{
 		"to":        user.Email,
-		"from":      "hello@resultspro.ng",
-		"from_name": "Results Pro",
+		"from":      "hello@netslogistics.com",
+		"from_name": "Nets Logistics",
 		"subject":   "Password Reset Instructions",
 		"html":      htmlBody,
 	}

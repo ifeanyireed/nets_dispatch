@@ -10,7 +10,7 @@ return [
     // SMTP Configuration (Hostinger Local SMTP or remote)
     'smtp_host'     => 'smtp.hostinger.com', 
     'smtp_auth'     => true,                 
-    'smtp_username' => 'hello@resultspro.ng',
+    'smtp_username' => 'hello@netslogistics.com',
     'smtp_password' => '*Reedb4b4',
     // ENCRYPTION_STARTTLS (587) or ENCRYPTION_SMTPS (465)
     'smtp_secure'   => PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS, 

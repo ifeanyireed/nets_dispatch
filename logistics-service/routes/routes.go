@@ -33,6 +33,9 @@ func SetupRouter() *gin.Engine {
 	r.POST("/auth/forgot-password", handlers.ForgotPassword)
 	r.POST("/auth/reset-password", handlers.ResetPassword)
 
+	// Upload
+	r.POST("/upload", handlers.Upload)
+
 	// Email Proxy
 	r.POST("/email/send", handlers.SendEmailProxy)
 

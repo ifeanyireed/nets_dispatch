@@ -71,12 +71,29 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
+        String errorMessage = 'Invalid credentials';
+        try {
+          final data = jsonDecode(response.body);
+          if (data['error'] != null) errorMessage = data['error'];
+        } catch (_) {}
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: AppTheme.primaryRed,
-            content: Text(
-              'Login failed: ${response.body}',
-              style: TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(20),
+            content: Row(
+              children: [
+                const Icon(TablerIcons.alert_triangle, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    errorMessage,
+                    style: const TextStyle(fontFamily: 'Inter', color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ),
+              ],
             ),
           ),
         );

@@ -1,7 +1,9 @@
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
+import 'dart:io';
 import '../theme/app_theme.dart';
 import 'verification_status_screen.dart';
 
@@ -24,6 +26,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  
+  final ImagePicker _picker = ImagePicker();
+  bool _licenseUploaded = false;
+  bool _ninUploaded = false;
+  bool _vehicleDocsUploaded = false;
 
   @override
   void initState() {
@@ -469,17 +476,51 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           ),
           const SizedBox(height: 24),
           
-          _buildUploadBox("Driver's License", 'PDF or JPEG format', true),
+          _buildUploadBox("Driver's License", 'PDF or JPEG format', _licenseUploaded, () => _handleUpload('license')),
           const SizedBox(height: 14),
-          _buildUploadBox('National ID Card / NIN', 'Clear photo of front & back', false),
+          _buildUploadBox('National ID Card / NIN', 'Clear photo of front & back', _ninUploaded, () => _handleUpload('nin')),
           const SizedBox(height: 14),
           if (_ownBike) ...[
-            _buildUploadBox('Vehicle Registration papers', 'Proof of ownership docs', false),
+            _buildUploadBox('Vehicle Registration papers', 'Proof of ownership docs', _vehicleDocsUploaded, () => _handleUpload('vehicle')),
             const SizedBox(height: 14),
           ],
         ],
       ),
     );
+  }
+
+  Future<void> _handleUpload(String docType) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+    
+    setState(() => _isLoading = true);
+    
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse('http://localhost:8080/upload'));
+      request.files.add(await http.MultipartFile.fromPath('file', image.path));
+      
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        setState(() {
+          if (docType == 'license') _licenseUploaded = true;
+          if (docType == 'nin') _ninUploaded = true;
+          if (docType == 'vehicle') _vehicleDocsUploaded = true;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green, content: Text('Upload successful')));
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: AppTheme.primaryRed, content: Text('Upload failed')));
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: AppTheme.primaryRed, content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Widget _buildFieldLabel(String label) {
@@ -517,74 +558,77 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
     );
   }
 
-  Widget _buildUploadBox(String title, String subtitle, bool isCompleted) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.04)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isCompleted ? Colors.green.withOpacity(0.1) : AppTheme.inputBackground,
-                  shape: BoxShape.circle,
+  Widget _buildUploadBox(String title, String subtitle, bool isCompleted, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: isCompleted ? null : onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.cardBackground,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withOpacity(0.04)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isCompleted ? Colors.green.withOpacity(0.1) : AppTheme.inputBackground,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isCompleted ? TablerIcons.circle_check : TablerIcons.cloud_upload,
+                    color: isCompleted ? Colors.green : AppTheme.textSecondary,
+                    size: 22,
+                  ),
                 ),
-                child: Icon(
-                  isCompleted ? TablerIcons.circle_check : TablerIcons.cloud_upload,
-                  color: isCompleted ? Colors.green : AppTheme.textSecondary,
-                  size: 22,
+                const SizedBox(width: 14),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(fontFamily: 'Inter', 
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(fontFamily: 'Inter', 
+                        fontSize: 10,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isCompleted ? Colors.green.withOpacity(0.08) : Colors.white.withOpacity(0.04),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isCompleted ? Colors.green.withOpacity(0.2) : Colors.white.withOpacity(0.08),
                 ),
               ),
-              const SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(fontFamily: 'Inter', 
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontFamily: 'Inter', 
-                      fontSize: 10,
-                      color: AppTheme.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: isCompleted ? Colors.green.withOpacity(0.08) : Colors.white.withOpacity(0.04),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isCompleted ? Colors.green.withOpacity(0.2) : Colors.white.withOpacity(0.08),
+              child: Text(
+                isCompleted ? 'UPLOADED' : 'UPLOAD',
+                style: TextStyle(fontFamily: 'Inter', 
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: isCompleted ? Colors.green : Colors.white70,
+                ),
               ),
             ),
-            child: Text(
-              isCompleted ? 'UPLOADED' : 'UPLOAD',
-              style: TextStyle(fontFamily: 'Inter', 
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: isCompleted ? Colors.green : Colors.white70,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
