@@ -35,7 +35,7 @@ class BaseTextField extends StatelessWidget {
       initialValue: initialValue,
       keyboardType: TextInputType.number,
       decoration: new InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0)),
         labelText: labelText,
         labelStyle: const TextStyle(color: Colors.grey, fontSize: 14.0),
         suffixIcon: suffix == null
@@ -48,10 +48,10 @@ class BaseTextField extends StatelessWidget {
         errorMaxLines: 3,
         isDense: true,
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(30.0),
             borderSide: const BorderSide(color: Colors.grey, width: 0.5)),
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(30.0),
             borderSide:
                 BorderSide(color: const Color(0xFFE53935), width: 1.0)),
         hintText: hintText,

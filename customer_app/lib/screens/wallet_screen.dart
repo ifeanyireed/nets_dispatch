@@ -208,7 +208,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                   foregroundColor: AppTheme.primaryRed,
                                   elevation: 10,
                                   shadowColor: Colors.black.withOpacity(0.3),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                 ),
                                 child: const Row(

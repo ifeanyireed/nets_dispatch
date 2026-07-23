@@ -214,11 +214,14 @@ class _CheckoutWidgetState extends BaseState<CheckoutWidget>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               if (widget.logo == null)
-                Image.asset(
-                  'assets/images/paystack_icon.png',
-                  key: Key("PaystackIcon"),
-                  package: 'flutter_paystack',
-                  width: 25,
+                ColorFiltered(
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  child: Image.asset(
+                    'assets/images/paystack_icon.png',
+                    key: Key("PaystackIcon"),
+                    package: 'flutter_paystack',
+                    width: 25,
+                  ),
                 )
               else
                 SizedBox(
