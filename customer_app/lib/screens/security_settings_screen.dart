@@ -41,7 +41,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           // Background Decorators
           Positioned.fill(
             child: Image.asset(
-              'moodboard/biker09.jpeg',
+              'assets/moodboard/biker09.jpeg',
               fit: BoxFit.cover,
             ),
           ),
