@@ -112,6 +112,29 @@ type Address struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+type SecuritySetting struct {
+	UserID           string    `gorm:"type:char(36);primaryKey" json:"userId"`
+	TwoFactorEnabled bool      `gorm:"default:false" json:"twoFactorEnabled"`
+	LoginAlerts      bool      `gorm:"default:true" json:"loginAlerts"`
+	UpdatedAt        time.Time `json:"updatedAt"`
+}
+
+type Wallet struct {
+	UserID  string    `gorm:"type:char(36);primaryKey" json:"userId"`
+	Balance float64   `gorm:"default:0.0" json:"balance"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type PayoutRequest struct {
+	ID            string    `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID        string    `gorm:"type:char(36);index" json:"userId"`
+	Amount        float64   `json:"amount"`
+	BankName      string    `json:"bankName"`
+	AccountNumber string    `json:"accountNumber"`
+	Status        string    `gorm:"default:'Pending'" json:"status"`
+	CreatedAt     time.Time `json:"createdAt"`
+}
+
 func ConnectDB() {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
@@ -133,6 +156,7 @@ func ConnectDB() {
 	err = db.AutoMigrate(
 		&User{}, &Agent{}, &Vendor{}, &Rider{}, &Order{}, &Transaction{},
 		&Notification{}, &NotificationSetting{}, &Address{},
+		&SecuritySetting{}, &Wallet{}, &PayoutRequest{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
