@@ -14,6 +14,7 @@ export default function RidersTable({ initialRiders }) {
       case 'active': return "text-live bg-live/10 border border-live/20";
       case 'busy': return "text-hazard bg-hazard/10 border border-hazard/20";
       case 'suspended': return "text-alert bg-alert/10 border border-alert/20";
+      case 'rejected': return "text-alert bg-alert/10 border border-alert/20";
       case 'pending': return "text-[#f59e0b] bg-[#f59e0b]/10 border border-[#f59e0b]/20";
       default: return "text-text-1 bg-text-2/10 border border-hairline-2"; // offline or new
     }
@@ -128,7 +129,16 @@ export default function RidersTable({ initialRiders }) {
                           <IconCheckMark size={16} />
                         </button>
                       )}
-                      {rider.status !== 'Suspended' && (
+                      {(rider.status === 'Pending' || rider.status === 'New') && (
+                        <button 
+                          onClick={() => updateStatus(rider.id, "Rejected")} 
+                          className="p-1.5 rounded-md hover:bg-panel border border-transparent hover:border-hairline text-text-2 hover:text-text-0 transition-colors" 
+                          title="Disapprove"
+                        >
+                          <IconX size={16} />
+                        </button>
+                      )}
+                      {rider.status !== 'Suspended' && rider.status !== 'Rejected' && rider.status !== 'Pending' && rider.status !== 'New' && (
                         <button 
                           onClick={() => updateStatus(rider.id, "Suspended")} 
                           className="p-1.5 rounded-md hover:bg-[#f59e0b]/20 text-[#f59e0b] transition-colors" 
@@ -222,13 +232,24 @@ export default function RidersTable({ initialRiders }) {
                     </div>
                   </div>
                   
-                  <button 
-                    onClick={handleApprove}
-                    disabled={isApproving}
-                    className="w-full py-3 rounded-xl bg-hazard hover:bg-hazard/90 disabled:opacity-50 transition-colors text-white font-bold text-sm shadow-[0_4px_12px_rgba(239,68,68,0.3)] flex items-center justify-center gap-2"
-                  >
-                    {isApproving ? "Approving..." : "Approve & Activate Rider"}
-                  </button>
+                  <div className="flex gap-3 mt-2">
+                    <button 
+                      onClick={() => {
+                        updateStatus(selectedRider.id, "Rejected");
+                        setSelectedRider(null);
+                      }}
+                      className="flex-1 py-3 rounded-xl border border-hairline hover:bg-panel transition-colors text-text-0 font-bold text-sm flex items-center justify-center gap-2"
+                    >
+                      <IconX size={18} /> Reject
+                    </button>
+                    <button 
+                      onClick={handleApprove}
+                      disabled={isApproving}
+                      className="flex-[2] py-3 rounded-xl bg-hazard hover:bg-hazard/90 disabled:opacity-50 transition-colors text-white font-bold text-sm shadow-[0_4px_12px_rgba(239,68,68,0.3)] flex items-center justify-center gap-2"
+                    >
+                      {isApproving ? "Approving..." : "Approve & Activate Rider"}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
