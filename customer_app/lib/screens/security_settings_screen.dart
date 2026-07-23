@@ -11,7 +11,7 @@ class SecuritySettingsScreen extends StatefulWidget {
 
 class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
   bool _twoFactorEnabled = false;
-  bool _unrecognizedLoginAlerts = true;
+  bool _loginAlertsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +22,26 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(TablerIcons.chevron_left, color: Colors.white, size: 24),
+          icon: const Icon(TablerIcons.arrow_left, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Security Settings',
-          style: TextStyle(fontFamily: 'Inter', fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        title: Text(
+          'Security',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
         ),
-        centerTitle: true,
+        centerTitle: false,
       ),
       body: Stack(
         children: [
           // Background Decorators
           Positioned.fill(
             child: Image.asset(
-              'assets/moodboard/biker09.jpeg',
+              'moodboard/biker09.jpeg',
               fit: BoxFit.cover,
             ),
           ),
@@ -73,35 +78,125 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           ),
           SafeArea(
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionHeader('ACCOUNT SECURITY'),
-                  const SizedBox(height: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppTheme.cardBackground,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.04)),
+                  Text(
+                    'ACCOUNT PROTECTION',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.textSecondary,
+                      letterSpacing: 1.0,
                     ),
-                    child: Column(
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Two-Factor Auth
+                  _buildToggleRow(
+                    icon: TablerIcons.shield_check,
+                    title: 'Two-Factor Authentication',
+                    subtitle: 'Require a code from your SMS to log in.',
+                    value: _twoFactorEnabled,
+                    onChanged: (val) {
+                      setState(() {
+                        _twoFactorEnabled = val;
+                      });
+                    },
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Login Alerts
+                  _buildToggleRow(
+                    icon: TablerIcons.bell_ringing,
+                    title: 'Login Alerts',
+                    subtitle: 'Get notified of unrecognized logins.',
+                    value: _loginAlertsEnabled,
+                    onChanged: (val) {
+                      setState(() {
+                        _loginAlertsEnabled = val;
+                      });
+                    },
+                  ),
+                  
+                  const SizedBox(height: 32),
+                  
+                  // Additional security options
+                  Text(
+                    'DEVICE MANAGEMENT',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.textSecondary,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppTheme.cardBackground.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                    ),
+                    child: Row(
                       children: [
-                        _buildSwitchTile(
-                          'Two-Factor Authentication',
-                          'Require an extra step during login',
-                          TablerIcons.shield_lock,
-                          _twoFactorEnabled,
-                          (val) => setState(() => _twoFactorEnabled = val),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppTheme.inputBackground,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(TablerIcons.device_mobile, color: Colors.white70, size: 24),
                         ),
-                        const Divider(color: Colors.white10, height: 1),
-                        _buildSwitchTile(
-                          'Unrecognized Login Alerts',
-                          'Get notified of logins from new devices',
-                          TablerIcons.device_laptop,
-                          _unrecognizedLoginAlerts,
-                          (val) => setState(() => _unrecognizedLoginAlerts = val),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Current Device',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'iPhone 13 Pro • Lagos',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 12,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'ACTIVE',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.greenAccent,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -115,52 +210,72 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.2,
-          color: Colors.white.withOpacity(0.4),
+  Widget _buildToggleRow({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.cardBackground.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: value ? AppTheme.primaryRed.withOpacity(0.3) : Colors.white.withOpacity(0.08)
         ),
       ),
-    );
-  }
-
-  Widget _buildSwitchTile(String title, String subtitle, IconData icon, bool value, ValueChanged<bool> onChanged) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(icon, color: Colors.white70, size: 20),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(fontFamily: 'Inter', fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: Text(
-          subtitle,
-          style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: Colors.white.withOpacity(0.5)),
-        ),
-      ),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-        activeColor: AppTheme.primaryRed,
-        activeTrackColor: AppTheme.primaryRed.withOpacity(0.3),
-        inactiveThumbColor: Colors.white54,
-        inactiveTrackColor: Colors.white10,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: value ? AppTheme.primaryRed.withOpacity(0.15) : AppTheme.inputBackground,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              icon, 
+              color: value ? AppTheme.primaryRed : Colors.white70, 
+              size: 24
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: Colors.white,
+            activeTrackColor: AppTheme.primaryRed,
+            inactiveThumbColor: Colors.grey.shade400,
+            inactiveTrackColor: Colors.grey.shade800,
+          ),
+        ],
       ),
     );
   }
