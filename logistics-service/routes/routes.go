@@ -45,5 +45,11 @@ func SetupRouter() *gin.Engine {
 	// Email Proxy
 	r.POST("/email/send", handlers.SendEmailProxy)
 
+	// Notifications & Settings
+	r.GET("/users/:userId/notifications", handlers.GetNotifications)
+	r.PATCH("/notifications/:id/read", handlers.MarkNotificationRead)
+	r.GET("/users/:userId/settings/notifications", handlers.GetNotificationSettings)
+	r.PATCH("/users/:userId/settings/notifications", handlers.UpdateNotificationSettings)
+
 	return r
 }

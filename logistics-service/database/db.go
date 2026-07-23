@@ -81,6 +81,27 @@ type Transaction struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+type Notification struct {
+	ID        string    `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    string    `gorm:"type:char(36);index" json:"userId"`
+	Title     string    `json:"title"`
+	Message   string    `json:"message"`
+	Type      string    `json:"type"` // e.g., 'order_update', 'system_alert'
+	IsRead    bool      `gorm:"default:false" json:"isRead"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type NotificationSetting struct {
+	UserID            string    `gorm:"type:char(36);primaryKey" json:"userId"`
+	PushEnabled       bool      `gorm:"default:true" json:"pushEnabled"`
+	EmailEnabled      bool      `gorm:"default:true" json:"emailEnabled"`
+	OrderUpdates      bool      `gorm:"default:true" json:"orderUpdates"`
+	Promotions        bool      `gorm:"default:false" json:"promotions"`
+	SystemAlerts      bool      `gorm:"default:true" json:"systemAlerts"`
+	PushToken         string    `json:"pushToken"` // FCM or OneSignal token
+	UpdatedAt         time.Time `json:"updatedAt"`
+}
+
 func ConnectDB() {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
@@ -99,7 +120,10 @@ func ConnectDB() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	err = db.AutoMigrate(&User{}, &Agent{}, &Vendor{}, &Rider{}, &Order{}, &Transaction{})
+	err = db.AutoMigrate(
+		&User{}, &Agent{}, &Vendor{}, &Rider{}, &Order{}, &Transaction{},
+		&Notification{}, &NotificationSetting{},
+	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
