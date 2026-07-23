@@ -143,13 +143,18 @@ class _WalletScreenState extends State<WalletScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppTheme.primaryRed,
-                          const Color(0xFFE53935), // slightly darker red
-                          AppTheme.primaryRed.withOpacity(0.85),
+                          AppTheme.primaryRed.withOpacity(0.9),
+                          const Color(0xFFE53935).withOpacity(0.9),
+                          AppTheme.primaryRed.withOpacity(0.8),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         stops: const [0.0, 0.5, 1.0],
+                      ),
+                      image: const DecorationImage(
+                        image: AssetImage('assets/images/red-bg.jpg'),
+                        fit: BoxFit.cover,
+                        opacity: 0.6,
                       ),
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
