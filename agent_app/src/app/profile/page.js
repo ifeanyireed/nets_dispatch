@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { IconChevronLeft, IconMapPin, IconCreditCard, IconBell, IconHeadset, IconChevronRight, IconShieldCheck, IconUsers, IconMotorbike, IconChecklist, IconArchive, IconCamera } from "@tabler/icons-react";
 
 export default function Profile() {
@@ -11,13 +11,61 @@ export default function Profile() {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ riders: 0, pending: 0, orders: 0 });
+  const [isUploading, setIsUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("/images/biker11.jpeg");
+  const fileInputRef = useRef(null);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      // 1. Upload the file
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadRes = await fetch("https://nets-logistics-api.onrender.com/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(uploadData.error || "Failed to upload image");
+
+      const newAvatarUrl = uploadData.url;
+
+      // 2. Update user profile if we have their ID
+      if (userData?.id) {
+        const patchRes = await fetch(`https://nets-logistics-api.onrender.com/users/${userData.id}/avatar`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ avatarUrl: newAvatarUrl }),
+        });
+        if (!patchRes.ok) throw new Error("Failed to save avatar to profile");
+      }
+
+      // 3. Update local state
+      setAvatarUrl(newAvatarUrl);
+      const updatedUser = { ...userData, avatarUrl: newAvatarUrl };
+      setUserData(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   useEffect(() => {
     // Load from local storage
     const user = localStorage.getItem("user");
     const profile = localStorage.getItem("profile");
     
-    if (user) setUserData(JSON.parse(user));
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      setUserData(parsedUser);
+      if (parsedUser.avatarUrl) setAvatarUrl(parsedUser.avatarUrl);
+    }
     if (profile) setProfileData(JSON.parse(profile));
     
     // Fetch real stats
@@ -90,10 +138,25 @@ export default function Profile() {
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               
               <div className="relative z-10 mb-5">
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleImageUpload} 
+                  accept="image/*" 
+                  className="hidden" 
+                />
                 <div className="w-28 h-28 rounded-full border-4 border-ink ring-2 ring-hazard/50 shadow-[0_0_30px_rgba(239,68,68,0.2)] overflow-hidden bg-panel relative group-hover:ring-hazard transition-colors">
-                  <Image src="/images/biker11.jpeg" alt="Avatar" fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <Image src={avatarUrl} alt="Avatar" fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
                 </div>
-                <button className="absolute bottom-0 right-0 p-2 bg-hazard rounded-full border-2 border-ink text-white hover:scale-110 transition-transform shadow-lg cursor-pointer">
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute bottom-0 right-0 p-2 bg-hazard rounded-full border-2 border-ink text-white hover:scale-110 transition-transform shadow-lg cursor-pointer"
+                >
                   <IconCamera size={16} />
                 </button>
               </div>

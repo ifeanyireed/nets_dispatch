@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import '../theme.dart';
 import '../widgets/custom_bottom_nav.dart';
 
@@ -15,6 +18,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _name = "Guest User";
   String _email = "Not provided";
   String _phone = "Not provided";
+  String? _avatarUrl;
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -28,7 +33,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _name = prefs.getString('name') ?? "Guest User";
       _email = prefs.getString('email') ?? "Not provided";
       _phone = prefs.getString('phone') ?? "Not provided";
+      _avatarUrl = prefs.getString('avatarUrl');
     });
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    
+    if (pickedFile == null) return;
+    
+    setState(() {
+      _isUploading = true;
+    });
+
+    try {
+      // 1. Upload to server
+      var request = http.MultipartRequest('POST', Uri.parse('https://nets-logistics-api.onrender.com/upload'));
+      request.files.add(await http.MultipartFile.fromPath('file', pickedFile.path));
+      
+      var streamResponse = await request.send();
+      var response = await http.Response.fromStream(streamResponse);
+      
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        String newAvatarUrl = responseData['url'];
+        
+        // 2. Patch user profile
+        final prefs = await SharedPreferences.getInstance();
+        final userId = prefs.getString('userId'); // Assuming we saved userId on login
+        
+        if (userId != null) {
+          final patchResponse = await http.patch(
+            Uri.parse('https://nets-logistics-api.onrender.com/users/$userId/avatar'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({'avatarUrl': newAvatarUrl}),
+          );
+          
+          if (patchResponse.statusCode != 200) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to save avatar to profile.')),
+              );
+            }
+          }
+        }
+        
+        // 3. Save locally and update UI
+        await prefs.setString('avatarUrl', newAvatarUrl);
+        setState(() {
+          _avatarUrl = newAvatarUrl;
+        });
+        
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to upload image.')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error uploading image: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+    }
   }
 
   Future<void> _logout() async {
@@ -127,19 +201,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     offset: const Offset(0, 5),
                                   )
                                 ],
-                                image: const DecorationImage(
-                                  image: AssetImage('assets/moodboard/biker01.jpeg'),
+                                image: DecorationImage(
+                                  image: _avatarUrl != null 
+                                      ? NetworkImage(_avatarUrl!) as ImageProvider
+                                      : const AssetImage('assets/moodboard/biker01.jpeg'),
                                   fit: BoxFit.cover,
                                 ),
                               ),
+                              child: _isUploading 
+                                  ? const Center(
+                                      child: CircularProgressIndicator(color: Colors.white),
+                                    ) 
+                                  : null,
                             ),
                             Positioned(
                               bottom: 0,
                               right: 0,
                               child: GestureDetector(
-                                onTap: () {
-                                  // TODO: Handle photo update
-                                },
+                                onTap: _isUploading ? null : _pickAndUploadImage,
                                 child: Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
