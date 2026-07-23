@@ -20,6 +20,7 @@ func SetupRouter() *gin.Engine {
 
 	// Riders
 	r.GET("/riders", handlers.GetRiders)
+	r.PATCH("/riders/:id/status", handlers.UpdateRiderStatus)
 
 	// Orders
 	r.GET("/orders", handlers.GetOrders)

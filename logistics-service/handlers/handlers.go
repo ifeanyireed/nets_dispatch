@@ -52,3 +52,28 @@ func SeedDatabase(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Database seeded successfully"})
 }
+
+func UpdateRiderStatus(c *gin.Context) {
+	id := c.Param("id")
+	var req struct {
+		Status string `json:"status" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+		return
+	}
+
+	var rider database.Rider
+	if err := database.DB.Where("id = ?", id).First(&rider).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Rider not found"})
+		return
+	}
+
+	rider.Status = req.Status
+	if err := database.DB.Save(&rider).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, rider)
+}
