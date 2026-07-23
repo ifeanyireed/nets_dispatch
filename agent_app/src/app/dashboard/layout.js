@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const [profileName, setProfileName] = useState("Agent");
+  const [ridersCount, setRidersCount] = useState("");
 
   useEffect(() => {
     const p = localStorage.getItem("profile");
@@ -27,6 +28,14 @@ export default function DashboardLayout({ children }) {
         setProfileName(JSON.parse(p).name || "Agent");
       } catch (e) {}
     }
+    
+    // Fetch riders count
+    fetch("https://nets-logistics-api.onrender.com/riders")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setRidersCount(data.length.toString());
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -75,7 +84,7 @@ export default function DashboardLayout({ children }) {
           <div className="flex flex-col gap-1 mt-2">
           {[
             { name: "Orders", icon: IconArchive, iconFilled: IconArchiveFilled, color: "text-hazard" },
-            { name: "Riders", icon: IconMotorbike, iconFilled: IconMotorbikeFilled, color: "text-hazard" },
+            { name: "Riders", icon: IconMotorbike, iconFilled: IconMotorbikeFilled, color: "text-hazard", count: ridersCount },
             { name: "Vendors", icon: IconBasket, iconFilled: IconBasketFilled, color: "text-hazard" },
             { name: "Live Map", icon: IconMapPin, iconFilled: IconMapPinFilled, color: "text-hazard" },
             { name: "Dispatch", icon: IconTruck, iconFilled: IconTruckFilled, color: "text-hazard" },

@@ -7,8 +7,8 @@ import '../theme/app_theme.dart';
 import 'main_navigation_screen.dart';
 
 class VerificationStatusScreen extends StatefulWidget {
-  final String userId;
-  const VerificationStatusScreen({super.key, this.userId = ''});
+  final String? userId;
+  const VerificationStatusScreen({super.key, this.userId});
 
   @override
   State<VerificationStatusScreen> createState() => _VerificationStatusScreenState();
@@ -21,7 +21,7 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.userId.isNotEmpty) {
+    if (widget.userId != null && widget.userId!.isNotEmpty) {
       _startPolling();
     }
   }
