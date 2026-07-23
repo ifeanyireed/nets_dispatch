@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -69,6 +70,17 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final prefs = await SharedPreferences.getInstance();
+        if (data['token'] != null) await prefs.setString('token', data['token']);
+        if (data['profile'] != null) {
+          if (data['profile']['name'] != null) await prefs.setString('name', data['profile']['name']);
+          if (data['profile']['phone'] != null) await prefs.setString('phone', data['profile']['phone']);
+        }
+        if (data['user'] != null) {
+          if (data['user']['email'] != null) await prefs.setString('email', data['user']['email']);
+        }
+        
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         String errorMessage = 'Invalid credentials';

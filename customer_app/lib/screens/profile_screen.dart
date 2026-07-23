@@ -1,10 +1,42 @@
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme.dart';
 import '../widgets/custom_bottom_nav.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _name = "Guest User";
+  String _email = "Not provided";
+  String _phone = "Not provided";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _name = prefs.getString('name') ?? "Guest User";
+      _email = prefs.getString('email') ?? "Not provided";
+      _phone = prefs.getString('phone') ?? "Not provided";
+    });
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    if (!mounted) return;
+    Navigator.pushNamedAndRemoveUntil(context, '/welcome', (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,16 +50,17 @@ class ProfileScreen extends StatelessWidget {
         title: Text(
           'Profile',
           style: TextStyle(fontFamily: 'Inter', 
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
             color: Colors.white,
+            letterSpacing: -0.5,
           ),
         ),
         centerTitle: false,
       ),
       body: Stack(
         children: [
-          // Background Image
+          // Background Decorators
           Positioned.fill(
             child: Image.asset(
               'assets/moodboard/biker09.jpeg',
@@ -36,56 +69,93 @@ class ProfileScreen extends StatelessWidget {
           ),
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.92),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.7),
+                    Colors.black.withOpacity(0.95),
+                    Colors.black,
+                  ],
+                ),
+              ),
             ),
           ),
+          // Glow effect
+          Positioned(
+            top: -50,
+            right: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppTheme.primaryRed.withOpacity(0.15),
+                // ignore: prefer_const_constructors
+                boxShadow: [
+                  BoxShadow(color: AppTheme.primaryRed.withOpacity(0.2), blurRadius: 100, spreadRadius: 50)
+                ],
+              ),
+            ),
+          ),
+
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   
                   // Top Avatar header card
                   Center(
                     child: Column(
                       children: [
                         Container(
-                          width: 84,
-                          height: 84,
+                          width: 100,
+                          height: 100,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: AppTheme.primaryRed, width: 3),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.primaryRed.withOpacity(0.3),
+                                blurRadius: 20,
+                                spreadRadius: 5,
+                                offset: const Offset(0, 5),
+                              )
+                            ],
                             image: const DecorationImage(
                               image: AssetImage('assets/moodboard/biker01.jpeg'),
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
                         Text(
-                          'T. Balogun',
+                          _name,
                           style: TextStyle(fontFamily: 'Inter', 
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
                             color: Colors.white,
+                            letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.blue.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: Colors.blue.withOpacity(0.3)),
                           ),
                           child: Text(
                             'PREMIUM CUSTOMER',
                             style: TextStyle(fontFamily: 'Inter', 
-                              fontSize: 9,
+                              fontSize: 10,
                               fontWeight: FontWeight.w900,
-                              color: Colors.blue,
-                              letterSpacing: 0.5,
+                              color: Colors.blueAccent,
+                              letterSpacing: 1.0,
                             ),
                           ),
                         ),
@@ -93,57 +163,65 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   
                   // Personal Info Card
                   _buildSectionHeader('PERSONAL INFORMATION'),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppTheme.cardBackground.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.04)),
+                      color: AppTheme.cardBackground.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
                     ),
                     child: Column(
                       children: [
-                        _buildProfileKV('Phone Number', '0805 123 4502'),
-                        const SizedBox(height: 12),
-                        _buildProfileKV('Email Address', 't.balogun@example.com'),
-                        const SizedBox(height: 12),
-                        _buildProfileKV('Default Area', 'Lekki Phase 1, Lagos'),
+                        _buildProfileKV('Phone Number', _phone),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: Divider(color: Colors.white10, height: 1),
+                        ),
+                        _buildProfileKV('Email Address', _email),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          child: Divider(color: Colors.white10, height: 1),
+                        ),
+                        _buildProfileKV('Default Area', 'Lagos, Nigeria'),
                       ],
                     ),
                   ),
                   
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 28),
                   
-                  // Saved Addresses & Payment Methods
+                  // Account Settings
                   _buildSectionHeader('ACCOUNT SETTINGS'),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppTheme.cardBackground.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.04)),
+                      color: AppTheme.cardBackground.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
                     ),
                     child: Column(
                       children: [
                         _buildActionRow(context, TablerIcons.map_pin, 'Saved Addresses', 'Manage your delivery locations'),
-                        const SizedBox(height: 16),
-                        const Divider(color: AppTheme.inputBackground, height: 1),
-                        const SizedBox(height: 16),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.white10, height: 1),
+                        ),
                         _buildActionRow(context, TablerIcons.credit_card, 'Payment Methods', 'Manage your cards and wallet'),
-                        const SizedBox(height: 16),
-                        const Divider(color: AppTheme.inputBackground, height: 1),
-                        const SizedBox(height: 16),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.white10, height: 1),
+                        ),
                         _buildActionRow(context, TablerIcons.bell, 'Notifications', 'Manage alerts and updates'),
                       ],
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
                   
                   // Support Action Banner
                   GestureDetector(
@@ -152,16 +230,30 @@ class ProfileScreen extends StatelessWidget {
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryRed.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppTheme.primaryRed.withOpacity(0.2)),
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryRed.withOpacity(0.15),
+                            AppTheme.primaryRed.withOpacity(0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: AppTheme.primaryRed.withOpacity(0.3)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(TablerIcons.headset, color: AppTheme.primaryRed, size: 24),
-                          const SizedBox(width: 14),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryRed.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(TablerIcons.headset, color: AppTheme.primaryRed, size: 28),
+                          ),
+                          const SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,50 +261,50 @@ class ProfileScreen extends StatelessWidget {
                                 Text(
                                   'Help & Support',
                                   style: TextStyle(fontFamily: 'Inter', 
-                                    fontSize: 13,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w800,
                                     color: Colors.white,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Contact us for issues with your deliveries or account.',
                                   style: TextStyle(fontFamily: 'Inter', 
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: AppTheme.textSecondary,
-                                    height: 1.3,
+                                    height: 1.4,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const Icon(TablerIcons.chevron_right, color: AppTheme.primaryRed, size: 14),
+                          const Icon(TablerIcons.chevron_right, color: AppTheme.primaryRed, size: 20),
                         ],
                       ),
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   
                   // Logout Button
                   GestureDetector(
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/welcome', (route) => false),
+                    onTap: _logout,
                     child: Container(
                       width: double.infinity,
-                      height: 52,
+                      height: 56,
                       decoration: BoxDecoration(
                         color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(26),
-                        border: Border.all(color: Colors.white.withOpacity(0.12)),
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: Colors.white.withOpacity(0.15)),
                       ),
                       child: Center(
                         child: Text(
                           'LOG OUT',
                           style: TextStyle(fontFamily: 'Inter', 
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w800,
                             color: Colors.white70,
-                            letterSpacing: 1.5,
+                            letterSpacing: 2.0,
                           ),
                         ),
                       ),
@@ -231,7 +323,6 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
-
     );
   }
 
@@ -239,14 +330,14 @@ class ProfileScreen extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 10, left: 4),
+        padding: const EdgeInsets.only(bottom: 12, left: 4),
         child: Text(
           label,
           style: TextStyle(fontFamily: 'Inter', 
             fontSize: 11,
             fontWeight: FontWeight.w900,
             color: AppTheme.textSecondary,
-            letterSpacing: 0.5,
+            letterSpacing: 1.0,
           ),
         ),
       ),
@@ -260,7 +351,7 @@ class ProfileScreen extends StatelessWidget {
         Text(
           key,
           style: TextStyle(fontFamily: 'Inter', 
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppTheme.textSecondary,
           ),
@@ -268,8 +359,8 @@ class ProfileScreen extends StatelessWidget {
         Text(
           value,
           style: TextStyle(fontFamily: 'IBM Plex Mono', 
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
         ),
@@ -287,14 +378,14 @@ class ProfileScreen extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppTheme.inputBackground,
-                borderRadius: BorderRadius.circular(100),
+                color: AppTheme.inputBackground.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: Colors.white70, size: 20),
+              child: Icon(icon, color: Colors.white70, size: 22),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,23 +393,23 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(fontFamily: 'Inter', 
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 4),
                   Text(
                     subtitle,
                     style: TextStyle(fontFamily: 'Inter', 
-                      fontSize: 11,
+                      fontSize: 12,
                       color: AppTheme.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(TablerIcons.chevron_right, color: AppTheme.textSecondary, size: 16),
+            const Icon(TablerIcons.chevron_right, color: AppTheme.textSecondary, size: 18),
           ],
         ),
       ),
