@@ -45,3 +45,4 @@ app.*.map.json
 /android/app/release
 customer_app/lib/secrets.dart
 rider_app/lib/secrets.dart
+email_proxy/
