@@ -256,9 +256,10 @@ class _WalletScreenState extends State<WalletScreen> {
         ),
         centerTitle: false,
       ),
-      body: Stack(
-        children: [
-          // Background Decorators
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            // Background Decorators
           Positioned.fill(
             child: Image.asset(
               'moodboard/biker09.jpeg',
@@ -452,6 +453,7 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

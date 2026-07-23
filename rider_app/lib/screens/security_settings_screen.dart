@@ -36,10 +36,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
         ),
         centerTitle: false,
       ),
-      body: Stack(
-        children: [
-          // Background Decorators
-          Positioned.fill(
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            // Background Decorators
+            Positioned.fill(
             child: Image.asset(
               'moodboard/biker09.jpeg',
               fit: BoxFit.cover,
@@ -276,6 +277,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
             inactiveTrackColor: Colors.grey.shade800,
           ),
         ],
+      ),
       ),
     );
   }

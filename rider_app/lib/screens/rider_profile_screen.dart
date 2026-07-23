@@ -148,9 +148,10 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
         ),
         centerTitle: false,
       ),
-      body: Stack(
-        children: [
-          // Background Decorators
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            // Background Decorators
           Positioned.fill(
             child: Image.asset(
               'moodboard/biker09.jpeg',
@@ -566,6 +567,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
             const Icon(TablerIcons.chevron_right, color: AppTheme.textSecondary, size: 18),
           ],
         ),
+      ),
       ),
     );
   }

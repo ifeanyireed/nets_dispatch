@@ -9,6 +9,7 @@ import '../widgets/custom_bottom_nav.dart';
 import 'notification_settings_screen.dart';
 import 'wallet_screen.dart';
 import 'saved_addresses_screen.dart';
+import 'security_settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -135,9 +136,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         centerTitle: false,
       ),
-      body: Stack(
-        children: [
-          // Background Decorators
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            // Background Decorators
           Positioned.fill(
             child: Image.asset(
               'assets/moodboard/biker09.jpeg',
@@ -358,6 +360,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
                           },
                         ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: Colors.white10, height: 1),
+                        ),
+                        _buildActionRow(
+                          context, 
+                          TablerIcons.shield_lock, 
+                          'Security Settings', 
+                          'Manage account security and logins',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SecuritySettingsScreen()),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -551,6 +569,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const Icon(TablerIcons.chevron_right, color: AppTheme.textSecondary, size: 18),
           ],
         ),
+      ),
       ),
     );
   }

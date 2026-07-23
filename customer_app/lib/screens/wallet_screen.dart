@@ -111,9 +111,10 @@ class _WalletScreenState extends State<WalletScreen> {
         ),
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          // Background ambient light
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            // Background ambient light
           Positioned(
             top: -100,
             right: -50,
@@ -261,6 +262,7 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
