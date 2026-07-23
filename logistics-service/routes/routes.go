@@ -36,6 +36,9 @@ func SetupRouter() *gin.Engine {
 	r.POST("/auth/forgot-password", handlers.ForgotPassword)
 	r.POST("/auth/reset-password", handlers.ResetPassword)
 
+	// Users
+	r.PATCH("/users/:id/avatar", handlers.UpdateAvatar)
+
 	// Upload
 	r.POST("/upload", handlers.Upload)
 

@@ -116,3 +116,28 @@ func DeleteRider(c *gin.Context) {
 	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"message": "Rider deleted successfully"})
 }
+
+func UpdateAvatar(c *gin.Context) {
+	userId := c.Param("id")
+	var req struct {
+		AvatarURL string `json:"avatarUrl" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+		return
+	}
+
+	var user database.User
+	if err := database.DB.Where("id = ?", userId).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	user.AvatarURL = req.AvatarURL
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save avatar URL"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Avatar updated successfully", "avatarUrl": user.AvatarURL})
+}

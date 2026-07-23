@@ -16,6 +16,7 @@ type User struct {
 	Email        string    `gorm:"unique" json:"email"`
 	PasswordHash string    `json:"-"`
 	Role         string    `json:"role"` // 'agent', 'vendor', 'rider'
+	AvatarURL    string    `json:"avatarUrl"`
 	CreatedAt    time.Time `json:"createdAt"`
 	UpdatedAt    time.Time `json:"updatedAt"`
 }
