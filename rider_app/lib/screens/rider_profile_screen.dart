@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
 import 'bike_financing_screen.dart';
 import 'welcome_screen.dart';
+import 'wallet_screen.dart';
+import 'security_settings_screen.dart';
 
 class RiderProfileScreen extends StatefulWidget {
   final String? name;
@@ -331,6 +333,52 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                           child: Divider(color: Colors.white10, height: 1),
                         ),
                         _buildProfileKV('Ownership', 'Registered Rider'),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 28),
+                  
+                  // Account Settings Action Rows
+                  _buildSectionHeader('ACCOUNT SETTINGS'),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.cardBackground.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildActionRow(
+                          context,
+                          TablerIcons.wallet,
+                          'Wallet & Payouts',
+                          'Manage your earnings and withdraw funds',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const WalletScreen()),
+                            );
+                          },
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          child: Divider(color: Colors.white10, height: 1),
+                        ),
+                        _buildActionRow(
+                          context,
+                          TablerIcons.shield_lock,
+                          'Security Settings',
+                          'Two-factor auth and login alerts',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SecuritySettingsScreen()),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
