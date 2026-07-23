@@ -3,7 +3,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../theme/app_theme.dart';
+import '../theme.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -106,9 +106,9 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppTheme.screenBackground,
-        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -128,18 +128,18 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         centerTitle: true,
         actions: [
           if (_isSaving)
-            const Padding(
-              padding: EdgeInsets.only(right: 20),
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
               child: Center(
                 child: SizedBox(
                   width: 20, height: 20,
-                  child: CircularProgressIndicator(color: AppTheme.primaryColor, strokeWidth: 2),
+                  child: CircularProgressIndicator(color: AppTheme.primaryRed, strokeWidth: 2),
                 ),
               ),
             )
           else
             IconButton(
-              icon: const Icon(TablerIcons.device_floppy, color: AppTheme.primaryColor),
+              icon: Icon(TablerIcons.device_floppy, color: AppTheme.primaryRed),
               onPressed: _saveSettings,
             )
         ],
@@ -164,7 +164,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                     _buildSwitchTile(
                       'Push Notifications',
                       'Receive alerts directly on your device',
-                      TablerIcons.smartphone,
+                      TablerIcons.device_mobile,
                       _pushEnabled,
                       (val) => setState(() => _pushEnabled = val),
                     ),
@@ -202,7 +202,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                     _buildSwitchTile(
                       'System Alerts',
                       'Security notices and platform maintenance',
-                      TablerIcons.shield_alert,
+                      TablerIcons.shield,
                       _systemAlerts,
                       (val) => setState(() => _systemAlerts = val),
                     ),
@@ -266,8 +266,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: AppTheme.primaryColor,
-        activeTrackColor: AppTheme.primaryColor.withOpacity(0.3),
+        activeColor: AppTheme.primaryRed,
+        activeTrackColor: AppTheme.primaryRed.withOpacity(0.3),
         inactiveThumbColor: Colors.white54,
         inactiveTrackColor: Colors.white10,
       ),

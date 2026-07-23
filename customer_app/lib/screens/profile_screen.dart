@@ -485,11 +485,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildActionRow(BuildContext context, IconData icon, String title, String subtitle) {
+  Widget _buildActionRow(BuildContext context, IconData icon, String title, String subtitle, {VoidCallback? onTap}) {
     return GestureDetector(
-      onTap: () {
-        // Handle action tap
-      },
+      onTap: onTap ?? () {},
       child: Container(
         color: Colors.transparent, // to make the whole row clickable
         child: Row(
