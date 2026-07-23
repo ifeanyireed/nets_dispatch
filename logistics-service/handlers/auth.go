@@ -80,7 +80,7 @@ func Register(c *gin.Context) {
 			return
 		}
 	case "rider":
-		rider := database.Rider{ID: profileId, UserID: userId, Name: req.Name}
+		rider := database.Rider{ID: profileId, UserID: userId, Name: req.Name, Status: "Pending"}
 		if err := tx.Create(&rider).Error; err != nil {
 			tx.Rollback()
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create rider profile"})
