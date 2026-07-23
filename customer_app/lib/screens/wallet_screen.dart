@@ -44,7 +44,7 @@ class _WalletScreenState extends State<WalletScreen> {
     return 'NetsLogistics_${DateTime.now().millisecondsSinceEpoch}';
   }
 
-  void _fundWallet(BuildContext context) async {
+  void _processPayment(BuildContext context, {required int amountKobo, required bool isAddingCard}) async {
     if (!_isPaystackInitialized) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Payment gateway not initialized')),
@@ -53,7 +53,7 @@ class _WalletScreenState extends State<WalletScreen> {
     }
 
     final charge = Charge()
-      ..amount = 500000 // In kobo (₦5000)
+      ..amount = amountKobo
       ..reference = _getReference()
       ..email = 'customer@netslogistics.com'
       ..currency = 'NGN';
@@ -68,11 +68,16 @@ class _WalletScreenState extends State<WalletScreen> {
 
     if (response.status == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Wallet funded successfully!'), backgroundColor: Colors.green),
+        SnackBar(
+          content: Text(isAddingCard ? 'Card added successfully!' : 'Wallet funded successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
-      setState(() {
-        _walletBalance += 5000.0;
-      });
+      if (!isAddingCard) {
+        setState(() {
+          _walletBalance += (amountKobo / 100);
+        });
+      }
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(response.message), backgroundColor: Colors.red),
@@ -145,7 +150,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: () => _fundWallet(context),
+                      onPressed: () => _processPayment(context, amountKobo: 500000, isAddingCard: false),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: AppTheme.primaryRed,
@@ -192,7 +197,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       title: const Text('Add New Card', style: TextStyle(fontFamily: 'Inter', fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
                       subtitle: Text('Powered by Paystack', style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: Colors.white.withOpacity(0.5))),
                       trailing: const Icon(TablerIcons.chevron_right, color: Colors.white38, size: 20),
-                      onTap: () => _fundWallet(context),
+                      onTap: () => _processPayment(context, amountKobo: 5000, isAddingCard: true),
                     ),
                   ],
                 ),
