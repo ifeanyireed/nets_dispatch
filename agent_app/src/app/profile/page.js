@@ -40,7 +40,10 @@ export default function Profile() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ avatarUrl: newAvatarUrl }),
         });
-        if (!patchRes.ok) throw new Error("Failed to save avatar to profile");
+        if (!patchRes.ok) {
+          const errData = await patchRes.json().catch(() => ({}));
+          throw new Error(`Failed to save avatar to profile: ${errData.error || patchRes.statusText}`);
+        }
       }
 
       // 3. Update local state
