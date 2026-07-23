@@ -52,7 +52,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8080/auth/register'),
+        Uri.parse('https://nets-logistics-api.onrender.com/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': email,

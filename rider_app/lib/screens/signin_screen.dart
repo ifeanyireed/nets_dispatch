@@ -51,7 +51,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8080/auth/login'),
+        Uri.parse('https://nets-logistics-api.onrender.com/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );

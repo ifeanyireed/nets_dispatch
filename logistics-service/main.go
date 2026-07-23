@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"logistics-service/database"
 	"logistics-service/routes"
 	"github.com/joho/godotenv"
@@ -17,8 +18,13 @@ func main() {
 
 	r := routes.SetupRouter()
 	
-	log.Println("Server running on port 8080")
-	if err := r.Run(":8080"); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	
+	log.Printf("Server running on port %s", port)
+	if err := r.Run(":" + port); err != nil {
 		log.Fatal(err)
 	}
 }

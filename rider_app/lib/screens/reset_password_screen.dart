@@ -47,7 +47,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8080/auth/reset-password'),
+        Uri.parse('https://nets-logistics-api.onrender.com/auth/reset-password'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'token': token, 'newPassword': newPassword}),
       );
