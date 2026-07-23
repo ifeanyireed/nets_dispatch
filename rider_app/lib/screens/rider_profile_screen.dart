@@ -125,25 +125,51 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                   Center(
                     child: Column(
                       children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppTheme.primaryRed, width: 3),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryRed.withOpacity(0.3),
-                                blurRadius: 20,
-                                spreadRadius: 5,
-                                offset: const Offset(0, 5),
-                              )
-                            ],
-                            image: DecorationImage(
-                              image: AssetImage(widget.image ?? 'moodboard/biker01.jpeg'),
-                              fit: BoxFit.cover,
+                        Stack(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppTheme.primaryRed, width: 3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.primaryRed.withOpacity(0.3),
+                                    blurRadius: 20,
+                                    spreadRadius: 5,
+                                    offset: const Offset(0, 5),
+                                  )
+                                ],
+                                image: DecorationImage(
+                                  image: AssetImage(widget.image ?? 'moodboard/biker01.jpeg'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                          ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  // TODO: Handle photo update
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryRed,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.black, width: 2),
+                                  ),
+                                  child: const Icon(
+                                    TablerIcons.camera,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         Text(

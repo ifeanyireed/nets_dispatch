@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { IconChevronLeft, IconMapPin, IconCreditCard, IconBell, IconHeadset, IconChevronRight, IconShieldCheck, IconUsers, IconMotorbike, IconChecklist, IconArchive } from "@tabler/icons-react";
+import { IconChevronLeft, IconMapPin, IconCreditCard, IconBell, IconHeadset, IconChevronRight, IconShieldCheck, IconUsers, IconMotorbike, IconChecklist, IconArchive, IconCamera } from "@tabler/icons-react";
 
 export default function Profile() {
   const router = useRouter();
@@ -89,8 +89,13 @@ export default function Profile() {
             <div className="bg-panel border border-hairline rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               
-              <div className="w-28 h-28 rounded-full border-4 border-ink ring-2 ring-hazard/50 shadow-[0_0_30px_rgba(239,68,68,0.2)] overflow-hidden mb-5 relative bg-panel z-10">
-                <Image src="/images/biker11.jpeg" alt="Avatar" fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div className="relative z-10 mb-5">
+                <div className="w-28 h-28 rounded-full border-4 border-ink ring-2 ring-hazard/50 shadow-[0_0_30px_rgba(239,68,68,0.2)] overflow-hidden bg-panel relative group-hover:ring-hazard transition-colors">
+                  <Image src="/images/biker11.jpeg" alt="Avatar" fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                </div>
+                <button className="absolute bottom-0 right-0 p-2 bg-hazard rounded-full border-2 border-ink text-white hover:scale-110 transition-transform shadow-lg cursor-pointer">
+                  <IconCamera size={16} />
+                </button>
               </div>
               
               <h2 className="text-white text-2xl font-extrabold mb-1.5 z-10 text-center">{name}</h2>
