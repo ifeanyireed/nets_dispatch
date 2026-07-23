@@ -80,15 +80,15 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0E0E0E] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-azure border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-hazard border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0E0E0E] text-white">
+    <div className="min-h-screen bg-ink text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0E0E0E]/80 backdrop-blur-xl border-b border-white/5">
+      <header className="sticky top-0 z-50 bg-ink/80 backdrop-blur-xl border-b border-hairline">
         <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard" className="p-2 hover:bg-white/5 rounded-full transition-colors">
@@ -104,7 +104,7 @@ export default function SettingsPage() {
           <button
             onClick={saveSettings}
             disabled={isSaving}
-            className="px-6 py-2.5 bg-azure text-white text-sm font-semibold rounded-full hover:bg-azure/90 transition-all shadow-lg shadow-azure/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            className="px-6 py-2.5 bg-hazard text-white text-sm font-semibold rounded-full hover:bg-hazard/90 transition-all shadow-lg shadow-hazard/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
           >
             {isSaving ? (
               <>
@@ -130,7 +130,7 @@ export default function SettingsPage() {
           {/* Notification Channels */}
           <section className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
             <div className="p-6 border-b border-white/5 flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-azure/10 flex items-center justify-center text-azure">
+              <div className="w-10 h-10 rounded-xl bg-sky/10 flex items-center justify-center text-sky">
                 <IconBell className="w-5 h-5" />
               </div>
               <div>
@@ -159,7 +159,7 @@ export default function SettingsPage() {
           {/* Alert Types */}
           <section className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
             <div className="p-6 border-b border-white/5 flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-hazel/10 flex items-center justify-center text-hazel">
+              <div className="w-10 h-10 rounded-xl bg-[#f59e0b]/10 flex items-center justify-center text-[#f59e0b]">
                 <IconShield className="w-5 h-5" />
               </div>
               <div>
@@ -212,7 +212,7 @@ function ToggleRow({ icon, title, description, checked, onChange }) {
       <button
         type="button"
         className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-          checked ? 'bg-azure' : 'bg-gray-700'
+          checked ? 'bg-live' : 'bg-panel-3'
         }`}
         role="switch"
         aria-checked={checked}
