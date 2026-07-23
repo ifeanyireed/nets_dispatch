@@ -8,6 +8,7 @@ import '../theme.dart';
 import '../widgets/custom_bottom_nav.dart';
 import 'notification_settings_screen.dart';
 import 'wallet_screen.dart';
+import 'saved_addresses_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -313,7 +314,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                        _buildActionRow(context, TablerIcons.map_pin, 'Saved Addresses', 'Manage your delivery locations'),
+                        _buildActionRow(
+                          context,
+                          TablerIcons.map_pin,
+                          'Saved Addresses',
+                          'Manage your delivery locations',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SavedAddressesScreen()),
+                            );
+                          },
+                        ),
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
                           child: Divider(color: Colors.white10, height: 1),
