@@ -259,7 +259,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                           title: const Text('Add New Card', style: TextStyle(fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                           subtitle: Padding(
-                            padding: const EdgeInsets.top(4),
+                            padding: const EdgeInsets.only(top: 4),
                             child: Text('Securely link a debit or credit card', style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Colors.white.withOpacity(0.5))),
                           ),
                           trailing: Container(
