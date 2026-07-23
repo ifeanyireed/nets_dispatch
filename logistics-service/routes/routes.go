@@ -38,6 +38,10 @@ func SetupRouter() *gin.Engine {
 
 	// Users
 	r.PATCH("/users/:id/avatar", handlers.UpdateAvatar)
+	r.GET("/users/:userId/addresses", handlers.GetAddresses)
+	r.POST("/users/:userId/addresses", handlers.CreateAddress)
+	r.PATCH("/addresses/:id", handlers.UpdateAddress)
+	r.DELETE("/addresses/:id", handlers.DeleteAddress)
 
 	// Upload
 	r.POST("/upload", handlers.Upload)

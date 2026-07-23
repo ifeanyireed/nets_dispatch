@@ -102,6 +102,16 @@ type NotificationSetting struct {
 	UpdatedAt         time.Time `json:"updatedAt"`
 }
 
+type Address struct {
+	ID        string    `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    string    `gorm:"type:char(36);index" json:"userId"`
+	Title     string    `json:"title"`
+	Address   string    `json:"address"`
+	Type      string    `json:"type"` // e.g. 'home', 'briefcase'
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
 func ConnectDB() {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
@@ -122,7 +132,7 @@ func ConnectDB() {
 
 	err = db.AutoMigrate(
 		&User{}, &Agent{}, &Vendor{}, &Rider{}, &Order{}, &Transaction{},
-		&Notification{}, &NotificationSetting{},
+		&Notification{}, &NotificationSetting{}, &Address{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)

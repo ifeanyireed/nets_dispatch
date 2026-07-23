@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme.dart';
 
 class SavedAddressesScreen extends StatefulWidget {
@@ -10,19 +12,162 @@ class SavedAddressesScreen extends StatefulWidget {
 }
 
 class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
-  // Mock data for now
-  final List<Map<String, String>> _addresses = [
-    {
-      'title': 'Home',
-      'address': 'Plot 4, Admiralty Way, Lekki Phase 1, Lagos',
-      'type': 'home'
-    },
-    {
-      'title': 'Office',
-      'address': 'Landmark Centre, Water Corporation Drive, Victoria Island, Lagos',
-      'type': 'briefcase'
-    },
-  ];
+  List<Map<String, dynamic>> _addresses = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAddresses();
+  }
+
+  Future<void> _loadAddresses() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? addressesJson = prefs.getString('saved_addresses');
+    if (addressesJson != null) {
+      final List<dynamic> decoded = json.decode(addressesJson);
+      setState(() {
+        _addresses = List<Map<String, dynamic>>.from(decoded);
+        _isLoading = false;
+      });
+    } else {
+      setState(() {
+        _addresses = [];
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _saveAddresses() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('saved_addresses', json.encode(_addresses));
+  }
+
+  void _deleteAddress(int index) {
+    setState(() {
+      _addresses.removeAt(index);
+    });
+    _saveAddresses();
+  }
+
+  void _showAddressDialog({int? index}) {
+    final bool isEditing = index != null;
+    final Map<String, dynamic> currentAddress = isEditing ? _addresses[index] : {'title': '', 'address': '', 'type': 'home'};
+    
+    final titleController = TextEditingController(text: currentAddress['title']);
+    final addressController = TextEditingController(text: currentAddress['address']);
+    String selectedType = currentAddress['type'];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return Dialog(
+              backgroundColor: AppTheme.cardBackground,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isEditing ? 'Edit Address' : 'Add New Address',
+                      style: const TextStyle(fontFamily: 'Inter', fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                    ),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: titleController,
+                      style: const TextStyle(color: Colors.white, fontFamily: 'Inter'),
+                      decoration: InputDecoration(
+                        labelText: 'Label (e.g., Home, Office)',
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.05),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: addressController,
+                      style: const TextStyle(color: Colors.white, fontFamily: 'Inter'),
+                      maxLines: 2,
+                      decoration: InputDecoration(
+                        labelText: 'Full Address',
+                        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.05),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text('Type', style: TextStyle(color: Colors.white70, fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        _buildTypeSelector('home', TablerIcons.home, selectedType, () => setStateDialog(() => selectedType = 'home')),
+                        const SizedBox(width: 12),
+                        _buildTypeSelector('briefcase', TablerIcons.briefcase, selectedType, () => setStateDialog(() => selectedType = 'briefcase')),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (titleController.text.trim().isEmpty || addressController.text.trim().isEmpty) return;
+                          
+                          final newAddr = {
+                            'title': titleController.text.trim(),
+                            'address': addressController.text.trim(),
+                            'type': selectedType,
+                          };
+
+                          setState(() {
+                            if (isEditing) {
+                              _addresses[index] = newAddr;
+                            } else {
+                              _addresses.add(newAddr);
+                            }
+                          });
+                          _saveAddresses();
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryRed,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(isEditing ? 'Save Changes' : 'Add Address', style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+        );
+      },
+    );
+  }
+
+  Widget _buildTypeSelector(String type, IconData icon, String selectedType, VoidCallback onTap) {
+    final bool isSelected = type == selectedType;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryRed.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? AppTheme.primaryRed : Colors.transparent),
+        ),
+        child: Icon(icon, color: isSelected ? AppTheme.primaryRed : Colors.white60, size: 24),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +218,9 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                   const SizedBox(height: 32),
                   
                   Expanded(
-                    child: _addresses.isEmpty
+                    child: _isLoading 
+                      ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryRed))
+                      : _addresses.isEmpty
                         ? const Center(
                             child: Text(
                               'No saved addresses found.',
@@ -86,7 +233,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                             separatorBuilder: (context, index) => const SizedBox(height: 16),
                             itemBuilder: (context, index) {
                               final address = _addresses[index];
-                              return _buildAddressCard(address);
+                              return _buildAddressCard(address, index);
                             },
                           ),
                   ),
@@ -97,9 +244,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Navigate to add address map
-                      },
+                      onPressed: () => _showAddressDialog(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryRed,
                         foregroundColor: Colors.white,
@@ -131,7 +276,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     );
   }
 
-  Widget _buildAddressCard(Map<String, String> address) {
+  Widget _buildAddressCard(Map<String, dynamic> address, int index) {
     IconData icon = TablerIcons.map_pin;
     if (address['type'] == 'home') icon = TablerIcons.home;
     if (address['type'] == 'briefcase') icon = TablerIcons.briefcase;
@@ -194,14 +339,14 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
             children: [
               IconButton(
                 icon: const Icon(TablerIcons.edit, color: Colors.white70, size: 20),
-                onPressed: () {},
+                onPressed: () => _showAddressDialog(index: index),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(height: 16),
               IconButton(
                 icon: Icon(TablerIcons.trash, color: AppTheme.primaryRed.withOpacity(0.8), size: 20),
-                onPressed: () {},
+                onPressed: () => _deleteAddress(index),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
