@@ -41,11 +41,13 @@ dependencies:
   geolocator: ^14.0.2
   shared_preferences: ^2.5.5
   image_picker: ^1.2.2
-  flutter_paystack_plus: ^2.5.0
+  flutter_paystack: ^1.0.7
   flutter_dotenv: ^5.2.1
 
 dependency_overrides:
   http: ^1.6.0
+  flutter_paystack:
+    path: ./packages/flutter_paystack_local
 
 dev_dependencies:
   flutter_test:

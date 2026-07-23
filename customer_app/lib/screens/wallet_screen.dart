@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-import 'package:flutter_paystack_plus/flutter_paystack_plus.dart';
+import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../theme.dart';
 
@@ -12,11 +12,14 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+  final _paystackPlugin = PaystackPlugin();
+  bool _isPaystackInitialized = false;
   double _walletBalance = 0.0;
 
   @override
   void initState() {
     super.initState();
+    _initializePaystack();
     // Simulate fetching wallet balance
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
@@ -27,49 +30,53 @@ class _WalletScreenState extends State<WalletScreen> {
     });
   }
 
+  Future<void> _initializePaystack() async {
+    final publicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'];
+    if (publicKey != null) {
+      await _paystackPlugin.initialize(publicKey: publicKey);
+      setState(() {
+        _isPaystackInitialized = true;
+      });
+    }
+  }
+
+  String _getReference() {
+    return 'NetsLogistics_${DateTime.now().millisecondsSinceEpoch}';
+  }
+
   void _fundWallet(BuildContext context) async {
-    final secretKey = dotenv.env['PAYSTACK_SECRET_KEY'];
-    
-    if (secretKey == null) {
+    if (!_isPaystackInitialized) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Payment gateway configuration missing')),
+        const SnackBar(content: Text('Payment gateway not initialized')),
       );
       return;
     }
 
-    try {
-      await FlutterPaystackPlus.openPaystackPopup(
-        context: context,
-        customerEmail: 'customer@netslogistics.com',
-        amount: '500000', // ₦5000 in kobo
-        reference: 'NetsLogistics_${DateTime.now().millisecondsSinceEpoch}',
-        secretKey: secretKey,
-        callBackUrl: 'https://netslogistics.com/callback',
-        currency: 'NGN',
-        onSuccess: () {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Wallet funded successfully!'), backgroundColor: Colors.green),
-            );
-            setState(() {
-              _walletBalance += 5000.0;
-            });
-          }
-        },
-        onClosed: () {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Payment cancelled.'), backgroundColor: Colors.orange),
-            );
-          }
-        },
+    final charge = Charge()
+      ..amount = 500000 // In kobo (₦5000)
+      ..reference = _getReference()
+      ..email = 'customer@netslogistics.com'
+      ..currency = 'NGN';
+
+    final response = await _paystackPlugin.checkout(
+      context,
+      method: CheckoutMethod.card, // Only use card method to skip modal options if needed, but it shows native UI
+      charge: charge,
+      fullscreen: false,
+      logo: const Icon(TablerIcons.wallet, color: AppTheme.primaryRed, size: 40),
+    );
+
+    if (response.status == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Wallet funded successfully!'), backgroundColor: Colors.green),
       );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Payment Error: $e'), backgroundColor: Colors.red),
-        );
-      }
+      setState(() {
+        _walletBalance += 5000.0;
+      });
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.message), backgroundColor: Colors.red),
+      );
     }
   }
 
