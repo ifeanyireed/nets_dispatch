@@ -28,12 +28,21 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
 
   void _startPolling() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      try {
-        final response = await http.get(Uri.parse('https://nets-logistics-api.onrender.com/riders/profile/${widget.userId}'));
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          if (data['status'] == 'Active') {
-            timer.cancel();
+      await _checkStatus();
+    });
+  }
+
+  Future<void> _checkStatus() async {
+    if (widget.userId == null || widget.userId!.isEmpty) return;
+    
+    try {
+      final response = await http.get(Uri.parse('https://nets-logistics-api.onrender.com/riders/profile/${widget.userId!.trim()}'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final status = data['status']?.toString().toLowerCase();
+        if (status == 'active') {
+          _timer?.cancel();
+          if (mounted) {
             setState(() {
               _isActive = true;
             });
@@ -49,10 +58,10 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
             });
           }
         }
-      } catch (e) {
-        debugPrint("Polling error: $e");
       }
-    });
+    } catch (e) {
+      debugPrint("Polling error: $e");
+    }
   }
 
   @override
@@ -182,11 +191,27 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
                     subtitle: 'Get approved and start delivering',
                     status: _isActive ? TimelineStatus.completed : TimelineStatus.pending,
                   ),
-
                   
                   const Spacer(),
                   
-
+                  // Manual Refresh Button
+                  if (!_isActive)
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Checking status...'), duration: Duration(seconds: 1)),
+                          );
+                          _checkStatus();
+                        },
+                        icon: const Icon(TablerIcons.refresh, color: AppTheme.textSecondary, size: 18),
+                        label: const Text(
+                          'Refresh Status',
+                          style: TextStyle(fontFamily: 'Inter', color: AppTheme.textSecondary, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    
                 ],
               ),
             ),
