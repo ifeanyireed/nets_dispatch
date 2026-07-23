@@ -74,13 +74,13 @@ export default function DashboardLayout({ children }) {
 
           <div className="flex flex-col gap-1 mt-2">
           {[
-            { name: "Orders", icon: IconArchive, iconFilled: IconArchiveFilled, color: "text-hazard", count: "96" },
-            { name: "Riders", icon: IconMotorbike, iconFilled: IconMotorbikeFilled, color: "text-hazard", count: "214" },
-            { name: "Vendors", icon: IconBasket, iconFilled: IconBasketFilled, color: "text-hazard", count: "48" },
-            { name: "Live Map", icon: IconMapPin, iconFilled: IconMapPinFilled, color: "text-hazard", count: "" },
-            { name: "Dispatch", icon: IconTruck, iconFilled: IconTruckFilled, color: "text-hazard", count: "12" },
-            { name: "Finance", icon: IconReceipt, iconFilled: IconReceiptFilled, color: "text-hazard", count: "" },
-            { name: "Reports", icon: IconReportAnalytics, iconFilled: IconReportAnalyticsFilled, color: "text-hazard", count: "" },
+            { name: "Orders", icon: IconArchive, iconFilled: IconArchiveFilled, color: "text-hazard" },
+            { name: "Riders", icon: IconMotorbike, iconFilled: IconMotorbikeFilled, color: "text-hazard" },
+            { name: "Vendors", icon: IconBasket, iconFilled: IconBasketFilled, color: "text-hazard" },
+            { name: "Live Map", icon: IconMapPin, iconFilled: IconMapPinFilled, color: "text-hazard" },
+            { name: "Dispatch", icon: IconTruck, iconFilled: IconTruckFilled, color: "text-hazard" },
+            { name: "Finance", icon: IconReceipt, iconFilled: IconReceiptFilled, color: "text-hazard" },
+            { name: "Reports", icon: IconReportAnalytics, iconFilled: IconReportAnalyticsFilled, color: "text-hazard" },
           ].map((item, i) => {
             const href = `/dashboard/${item.name.toLowerCase().replace(" ", "-")}`;
             const isActive = pathname === href;
