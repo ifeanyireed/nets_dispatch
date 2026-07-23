@@ -62,6 +62,20 @@ func SeedData() error {
 	}
 	if err := db.Create(&r1).Error; err != nil { return err }
 
+	uNewRider := database.User{ID: uuid.New().String(), Email: "newrider@nets.com", PasswordHash: hash, Role: "rider"}
+	if err := db.Create(&uNewRider).Error; err != nil { return err }
+
+	r2 := database.Rider{
+		ID:         uuid.New().String(),
+		UserID:     uNewRider.ID,
+		Name:       "John Doe",
+		Vehicle:    "Car",
+		Status:     "Pending",
+		Rating:     0.0,
+		Deliveries: 0,
+	}
+	if err := db.Create(&r2).Error; err != nil { return err }
+
 	// Create Orders
 	o1 := database.Order{
 		ID:       uuid.New().String(),
