@@ -1,6 +1,7 @@
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../theme/app_theme.dart';
 import 'main_navigation_screen.dart';
@@ -62,6 +63,22 @@ class _SignInScreenState extends State<SignInScreen> {
         });
 
         if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = jsonDecode(response.body);
+          final prefs = await SharedPreferences.getInstance();
+          
+          if (data['token'] != null) await prefs.setString('token', data['token']);
+          if (data['user'] != null && data['user']['id'] != null) {
+            await prefs.setString('userId', data['user']['id'].toString());
+          }
+          if (data['profile'] != null) {
+            if (data['profile']['name'] != null) await prefs.setString('name', data['profile']['name']);
+            if (data['profile']['phone'] != null) await prefs.setString('phone', data['profile']['phone']);
+            if (data['profile']['vehicle'] != null) await prefs.setString('vehicle', data['profile']['vehicle']);
+          }
+          if (data['user'] != null) {
+            if (data['user']['email'] != null) await prefs.setString('email', data['user']['email']);
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               backgroundColor: Colors.green,
