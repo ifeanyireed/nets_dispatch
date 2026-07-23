@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import '../theme.dart';
 import '../widgets/custom_bottom_nav.dart';
+import 'notification_settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -321,7 +322,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: EdgeInsets.symmetric(vertical: 16),
                           child: Divider(color: Colors.white10, height: 1),
                         ),
-                        _buildActionRow(context, TablerIcons.bell, 'Notifications', 'Manage alerts and updates'),
+                        _buildActionRow(
+                          context, 
+                          TablerIcons.bell, 
+                          'Notifications', 
+                          'Manage alerts and updates',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const NotificationSettingsScreen()),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),

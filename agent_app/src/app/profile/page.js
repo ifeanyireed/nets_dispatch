@@ -125,12 +125,20 @@ export default function Profile() {
             </h1>
             <p className="text-text-2 font-mono text-xs uppercase tracking-widest mt-1">Manage your console settings</p>
           </div>
-          <button 
-            onClick={handleLogout} 
-            className="hidden md:flex items-center justify-center px-6 py-2.5 rounded-full border border-hazard/30 bg-hazard/10 hover:bg-hazard hover:text-white hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all text-hazard font-bold text-xs tracking-widest uppercase"
-          >
-            Log Out
-          </button>
+          <div className="flex items-center gap-3 hidden md:flex">
+            <button 
+              onClick={() => router.push('/settings')} 
+              className="flex items-center justify-center px-6 py-2.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:text-white transition-all text-gray-300 font-bold text-xs tracking-widest uppercase"
+            >
+              Settings
+            </button>
+            <button 
+              onClick={handleLogout} 
+              className="flex items-center justify-center px-6 py-2.5 rounded-full border border-hazard/30 bg-hazard/10 hover:bg-hazard hover:text-white hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all text-hazard font-bold text-xs tracking-widest uppercase"
+            >
+              Log Out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
