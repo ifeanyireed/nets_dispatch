@@ -110,7 +110,20 @@ export default function RidersTable({ initialRiders }) {
                       <span className="font-semibold text-text-0 group-hover:text-hazard transition-colors">{rider.name || 'Unknown'}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-text-1">{rider.vehicle || 'N/A'}</td>
+                  <td className="px-6 py-4 text-text-1">
+                    {rider.vehicle ? (
+                      rider.vehicle.includes(" - ") ? (
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-text-0">{rider.vehicle.split(" - ")[1]}</span>
+                          <span className="text-xs text-text-2 font-mono mt-0.5">{rider.vehicle.split(" - ")[0]}</span>
+                        </div>
+                      ) : (
+                        rider.vehicle
+                      )
+                    ) : (
+                      'N/A'
+                    )}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(rider.status)}`}>
                       {rider.status || 'Offline'}
@@ -201,7 +214,20 @@ export default function RidersTable({ initialRiders }) {
               <div className="bg-panel rounded-2xl border border-hairline p-4 grid grid-cols-2 gap-4">
                 <div>
                   <span className="text-[10px] text-text-2 uppercase font-bold tracking-widest block mb-1">Vehicle</span>
-                  <span className="text-sm text-text-0 font-medium">{selectedRider.vehicle || 'Not provided'}</span>
+                  <div className="text-sm text-text-0 font-medium">
+                    {selectedRider.vehicle ? (
+                      selectedRider.vehicle.includes(" - ") ? (
+                        <>
+                          <span className="block">{selectedRider.vehicle.split(" - ")[1]}</span>
+                          <span className="block text-xs text-text-2 font-mono mt-0.5">{selectedRider.vehicle.split(" - ")[0]}</span>
+                        </>
+                      ) : (
+                        selectedRider.vehicle
+                      )
+                    ) : (
+                      'Not provided'
+                    )}
+                  </div>
                 </div>
                 <div>
                   <span className="text-[10px] text-text-2 uppercase font-bold tracking-widest block mb-1">Total Deliveries</span>
