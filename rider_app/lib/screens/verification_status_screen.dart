@@ -128,63 +128,7 @@ class VerificationStatusScreen extends StatelessWidget {
                   
                   const Spacer(),
                   
-                  // Simulator Shortcut note
-                  Center(
-                    child: Text(
-                      'DEVELOPER SIMULATION CONTROL',
-                      style: TextStyle(fontFamily: 'Inter', 
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: AppTheme.primaryRed,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  
-                  // Enter Dashboard Button
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-                        (route) => false,
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: 54,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF7A0000),
-                                        Color(0xFFFF2A2A),
-                                        Color(0xFF7A0000),
-                                      ],
-                                    ),
-                        borderRadius: BorderRadius.circular(27),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryRed.withOpacity(0.3),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          'SIMULATE APPROVAL & ENTER APP',
-                          style: TextStyle(fontFamily: 'Inter', 
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+
                 ],
               ),
             ),
