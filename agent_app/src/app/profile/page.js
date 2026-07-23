@@ -3,13 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { IconChevronLeft, IconMapPin, IconCreditCard, IconBell, IconHeadset, IconChevronRight, IconShieldCheck, IconUsers } from "@tabler/icons-react";
+import { IconChevronLeft, IconMapPin, IconCreditCard, IconBell, IconHeadset, IconChevronRight, IconShieldCheck, IconUsers, IconMotorbike, IconChecklist, IconArchive } from "@tabler/icons-react";
 
 export default function Profile() {
   const router = useRouter();
   const [userData, setUserData] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ riders: 0, pending: 0, orders: 0 });
 
   useEffect(() => {
     // Load from local storage
@@ -19,6 +20,27 @@ export default function Profile() {
     if (user) setUserData(JSON.parse(user));
     if (profile) setProfileData(JSON.parse(profile));
     
+    // Fetch real stats
+    const fetchStats = async () => {
+      try {
+        const [ridersRes, ordersRes] = await Promise.all([
+          fetch("https://nets-logistics-api.onrender.com/riders"),
+          fetch("https://nets-logistics-api.onrender.com/orders")
+        ]);
+        const riders = await ridersRes.json();
+        const orders = await ordersRes.json();
+        
+        if (Array.isArray(riders) && Array.isArray(orders)) {
+          setStats({
+            riders: riders.filter(r => r.status === "Active").length,
+            pending: riders.filter(r => r.status === "Pending").length,
+            orders: orders.length
+          });
+        }
+      } catch (e) {}
+    };
+
+    fetchStats();
     setLoading(false);
   }, []);
 
@@ -33,126 +55,173 @@ export default function Profile() {
   const email = userData?.email || "agent@nets.com";
   const hub = profileData?.hub || "HQ Dispatch";
 
-  if (loading) return <div className="min-h-screen bg-ink"></div>;
+  if (loading) return <div className="min-h-full bg-transparent flex items-center justify-center"><div className="w-8 h-8 rounded-full border-2 border-hazard border-t-transparent animate-spin" /></div>;
 
   return (
-    <main className="min-h-screen w-full flex bg-ink relative overflow-y-auto font-sans">
-      {/* Global Background Image */}
-      <div className="fixed inset-0 z-0">
-        <Image src="/images/biker14.jpeg" alt="App Background" fill className="object-cover opacity-30 mix-blend-luminosity" priority />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/95 to-ink" />
-      </div>
+    <main className="flex-1 w-full flex flex-col relative overflow-y-auto font-sans p-6 lg:p-10 hide-scrollbar">
+      {/* Background Decorators */}
+      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-hazard/10 to-transparent z-0 pointer-events-none mix-blend-screen" />
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-hazard/20 rounded-full blur-[120px] z-0 pointer-events-none" />
 
-      <div className="relative z-10 w-full flex flex-col px-6 py-10 max-w-lg mx-auto">
-        {/* App Bar */}
-        <div className="flex items-center justify-between mb-8">
-          <Link href="/dashboard" className="text-text-1 hover:text-white transition-colors p-2 -ml-2">
-            <IconChevronLeft size={24} />
-          </Link>
-          <span className="text-white font-extrabold text-lg tracking-wide">Profile</span>
-          <div className="w-10" />
+      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col gap-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-white font-extrabold text-3xl tracking-wide flex items-center gap-3">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
+                Agent Profile
+              </span>
+            </h1>
+            <p className="text-text-2 font-mono text-xs uppercase tracking-widest mt-1">Manage your console settings</p>
+          </div>
+          <button 
+            onClick={handleLogout} 
+            className="hidden md:flex items-center justify-center px-6 py-2.5 rounded-full border border-hazard/30 bg-hazard/10 hover:bg-hazard hover:text-white hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all text-hazard font-bold text-xs tracking-widest uppercase"
+          >
+            Log Out
+          </button>
         </div>
 
-        {/* Top Avatar header card */}
-        <div className="flex flex-col items-center justify-center mb-8">
-          <div className="w-[84px] h-[84px] rounded-full border-[3px] border-hazard overflow-hidden mb-4 relative shadow-[0_4px_20px_-4px_rgba(239,68,68,0.4)] bg-panel">
-            <Image src="/images/biker11.jpeg" alt="Avatar" fill className="object-cover" />
-          </div>
-          <h2 className="text-white text-[18px] font-extrabold mb-1.5">{name}</h2>
-          <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full">
-            <span className="text-blue-500 text-[9px] font-black tracking-[0.5px] uppercase">
-              PREMIUM AGENT
-            </span>
-          </div>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column: Identity Card & Stats */}
+          <div className="lg:col-span-1 flex flex-col gap-6">
+            {/* Identity Card */}
+            <div className="bg-panel border border-hairline rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <div className="w-28 h-28 rounded-full border-4 border-ink ring-2 ring-hazard/50 shadow-[0_0_30px_rgba(239,68,68,0.2)] overflow-hidden mb-5 relative bg-panel z-10">
+                <Image src="/images/biker11.jpeg" alt="Avatar" fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+              </div>
+              
+              <h2 className="text-white text-2xl font-extrabold mb-1.5 z-10 text-center">{name}</h2>
+              <div className="px-4 py-1.5 bg-hazard/10 border border-hazard/20 rounded-full z-10 mb-2">
+                <span className="text-hazard text-[10px] font-black tracking-[1px] uppercase">
+                  Level 4 Dispatcher
+                </span>
+              </div>
+              <p className="text-text-2 text-sm font-mono z-10 text-center">{hub}</p>
+            </div>
 
-        {/* Personal Info Card */}
-        <div className="mb-6">
-          <span className="text-[11px] font-black text-text-2 tracking-[0.5px] uppercase block mb-2.5 ml-1">
-            Personal Information
-          </span>
-          <div className="w-full bg-panel/90 backdrop-blur-md rounded-[20px] p-4 border border-white/5 flex flex-col gap-3">
-            <div className="flex justify-between items-center">
-              <span className="text-[12px] font-semibold text-text-2">Full Name</span>
-              <span className="text-[12px] font-extrabold text-white font-mono">{name}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[12px] font-semibold text-text-2">Email Address</span>
-              <span className="text-[12px] font-extrabold text-white font-mono">{email}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[12px] font-semibold text-text-2">Dispatch Hub</span>
-              <span className="text-[12px] font-extrabold text-white font-mono">{hub}</span>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-panel border border-hairline rounded-2xl p-5 hover:border-hairline-2 transition-colors flex flex-col items-center text-center">
+                <div className="w-10 h-10 rounded-full bg-live/10 flex items-center justify-center mb-3">
+                  <IconMotorbike size={20} className="text-live" />
+                </div>
+                <span className="text-2xl font-black text-white font-mono">{stats.riders}</span>
+                <span className="text-[10px] uppercase tracking-widest text-text-2 font-bold mt-1">Active Riders</span>
+              </div>
+              
+              <div className="bg-panel border border-hairline rounded-2xl p-5 hover:border-hairline-2 transition-colors flex flex-col items-center text-center">
+                <div className="w-10 h-10 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-3">
+                  <IconChecklist size={20} className="text-[#f59e0b]" />
+                </div>
+                <span className="text-2xl font-black text-white font-mono">{stats.pending}</span>
+                <span className="text-[10px] uppercase tracking-widest text-text-2 font-bold mt-1">Pending Approvals</span>
+              </div>
+              
+              <div className="col-span-2 bg-panel border border-hairline rounded-2xl p-5 hover:border-hairline-2 transition-colors flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center flex-none">
+                  <IconArchive size={24} className="text-blue-400" />
+                </div>
+                <div className="flex flex-col flex-1">
+                  <span className="text-2xl font-black text-white font-mono">{stats.orders}</span>
+                  <span className="text-[10px] uppercase tracking-widest text-text-2 font-bold">Total Orders Processed</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Account Settings */}
-        <div className="mb-6">
-          <span className="text-[11px] font-black text-text-2 tracking-[0.5px] uppercase block mb-2.5 ml-1">
-            Account Settings
-          </span>
-          <div className="w-full bg-panel/90 backdrop-blur-md rounded-[20px] p-4 border border-white/5 flex flex-col gap-4">
+          {/* Right Column: Settings & Info */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
             
-            <button className="flex items-center text-left group">
-              <div className="p-2 bg-ink rounded-full group-hover:bg-panel-2 transition-colors">
-                <IconShieldCheck size={20} className="text-white/70" />
+            {/* Personal Info */}
+            <div className="bg-panel border border-hairline rounded-3xl p-1 overflow-hidden">
+              <div className="px-6 py-5 border-b border-hairline bg-panel-2/30">
+                <h3 className="font-sans font-bold text-[13px] tracking-widest uppercase text-text-2">Personal Information</h3>
               </div>
-              <div className="ml-3.5 flex-1 flex flex-col">
-                <span className="text-[14px] font-bold text-white">Security</span>
-                <span className="text-[11px] text-text-2">Change your password and 2FA</span>
+              <div className="p-2">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 hover:bg-panel-2/50 rounded-2xl transition-colors">
+                  <span className="text-[13px] font-semibold text-text-1 mb-1 sm:mb-0">Full Name</span>
+                  <span className="text-[14px] font-bold text-white">{name}</span>
+                </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 hover:bg-panel-2/50 rounded-2xl transition-colors">
+                  <span className="text-[13px] font-semibold text-text-1 mb-1 sm:mb-0">Email Address</span>
+                  <span className="text-[14px] font-bold text-white">{email}</span>
+                </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 hover:bg-panel-2/50 rounded-2xl transition-colors">
+                  <span className="text-[13px] font-semibold text-text-1 mb-1 sm:mb-0">Role</span>
+                  <span className="text-[14px] font-bold text-white">Administrator Agent</span>
+                </div>
               </div>
-              <IconChevronRight size={16} className="text-text-2" />
-            </button>
+            </div>
+
+            {/* Account Settings */}
+            <div className="bg-panel border border-hairline rounded-3xl p-1 overflow-hidden">
+              <div className="px-6 py-5 border-b border-hairline bg-panel-2/30">
+                <h3 className="font-sans font-bold text-[13px] tracking-widest uppercase text-text-2">Preferences & Security</h3>
+              </div>
+              <div className="p-2 flex flex-col gap-1">
+                <button className="flex items-center text-left group p-3 hover:bg-panel-2 rounded-2xl transition-all">
+                  <div className="w-12 h-12 bg-ink rounded-xl border border-hairline flex items-center justify-center group-hover:border-hazard/30 group-hover:text-hazard transition-all text-text-1 shadow-sm">
+                    <IconShieldCheck size={24} />
+                  </div>
+                  <div className="ml-4 flex-1 flex flex-col">
+                    <span className="text-[15px] font-extrabold text-white group-hover:text-hazard transition-colors">Security Settings</span>
+                    <span className="text-[12px] text-text-2 mt-0.5">Password, 2FA, and active sessions</span>
+                  </div>
+                  <IconChevronRight size={20} className="text-text-2 group-hover:text-hazard transition-colors" />
+                </button>
+
+                <button className="flex items-center text-left group p-3 hover:bg-panel-2 rounded-2xl transition-all">
+                  <div className="w-12 h-12 bg-ink rounded-xl border border-hairline flex items-center justify-center group-hover:border-live/30 group-hover:text-live transition-all text-text-1 shadow-sm">
+                    <IconBell size={24} />
+                  </div>
+                  <div className="ml-4 flex-1 flex flex-col">
+                    <span className="text-[15px] font-extrabold text-white group-hover:text-live transition-colors">Notification Alerts</span>
+                    <span className="text-[12px] text-text-2 mt-0.5">Manage dashboard sounds and popups</span>
+                  </div>
+                  <IconChevronRight size={20} className="text-text-2 group-hover:text-live transition-colors" />
+                </button>
+                
+                <button className="flex items-center text-left group p-3 hover:bg-panel-2 rounded-2xl transition-all">
+                  <div className="w-12 h-12 bg-ink rounded-xl border border-hairline flex items-center justify-center group-hover:border-[#f59e0b]/30 group-hover:text-[#f59e0b] transition-all text-text-1 shadow-sm">
+                    <IconUsers size={24} />
+                  </div>
+                  <div className="ml-4 flex-1 flex flex-col">
+                    <span className="text-[15px] font-extrabold text-white group-hover:text-[#f59e0b] transition-colors">Team Access</span>
+                    <span className="text-[12px] text-text-2 mt-0.5">View other dispatchers in your hub</span>
+                  </div>
+                  <IconChevronRight size={20} className="text-text-2 group-hover:text-[#f59e0b] transition-colors" />
+                </button>
+              </div>
+            </div>
+
+            {/* Support Banner */}
+            <div className="bg-gradient-to-r from-hazard/20 to-hazard/5 border border-hazard/30 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden group">
+              <div className="absolute -right-6 -bottom-6 text-hazard/10 group-hover:text-hazard/20 transition-colors pointer-events-none">
+                <IconHeadset size={120} />
+              </div>
+              <div className="relative z-10 flex flex-col">
+                <span className="text-lg font-extrabold text-white mb-1">Need IT Support?</span>
+                <span className="text-[13px] text-text-1 max-w-sm">Contact the engineering team if you encounter bugs or require system-level access changes.</span>
+              </div>
+              <button className="relative z-10 whitespace-nowrap px-6 py-3 rounded-xl bg-hazard text-white font-bold text-[13px] shadow-[0_4px_14px_rgba(239,68,68,0.4)] hover:bg-hazard/90 hover:-translate-y-0.5 transition-all">
+                Contact Support
+              </button>
+            </div>
             
-            <div className="h-px w-full bg-white/5" />
-
-            <button className="flex items-center text-left group">
-              <div className="p-2 bg-ink rounded-full group-hover:bg-panel-2 transition-colors">
-                <IconUsers size={20} className="text-white/70" />
-              </div>
-              <div className="ml-3.5 flex-1 flex flex-col">
-                <span className="text-[14px] font-bold text-white">Rider Management</span>
-                <span className="text-[11px] text-text-2">Assign and monitor active riders</span>
-              </div>
-              <IconChevronRight size={16} className="text-text-2" />
-            </button>
-
-            <div className="h-px w-full bg-white/5" />
-
-            <button className="flex items-center text-left group">
-              <div className="p-2 bg-ink rounded-full group-hover:bg-panel-2 transition-colors">
-                <IconBell size={20} className="text-white/70" />
-              </div>
-              <div className="ml-3.5 flex-1 flex flex-col">
-                <span className="text-[14px] font-bold text-white">Notifications</span>
-                <span className="text-[11px] text-text-2">Manage alerts and updates</span>
-              </div>
-              <IconChevronRight size={16} className="text-text-2" />
+            <button 
+              onClick={handleLogout} 
+              className="md:hidden w-full h-[54px] bg-transparent border border-hairline hover:border-hazard/50 hover:bg-hazard/10 rounded-2xl flex items-center justify-center transition-all mt-4"
+            >
+              <span className="text-text-1 font-bold text-[13px] tracking-widest uppercase">
+                LOG OUT
+              </span>
             </button>
 
           </div>
         </div>
-
-        {/* Support Action Banner */}
-        <button className="w-full bg-hazard/10 border border-hazard/20 rounded-[20px] p-4 mb-8 flex items-center text-left hover:bg-hazard/15 transition-colors">
-          <IconHeadset size={24} className="text-hazard flex-none" />
-          <div className="ml-3.5 flex-1 flex flex-col">
-            <span className="text-[13px] font-extrabold text-white">Help & Support</span>
-            <span className="text-[11px] text-text-2 leading-[1.3] mt-0.5">Contact IT for issues with your dashboard or account.</span>
-          </div>
-          <IconChevronRight size={14} className="text-hazard flex-none" />
-        </button>
-
-        {/* Logout Button */}
-        <button 
-          onClick={handleLogout} 
-          className="w-full h-[52px] bg-transparent border border-white/10 rounded-full flex items-center justify-center transition-colors hover:bg-white/5 mb-10"
-        >
-          <span className="text-white/70 font-extrabold text-[12px] tracking-[1.5px] uppercase">
-            LOG OUT
-          </span>
-        </button>
       </div>
     </main>
   );
