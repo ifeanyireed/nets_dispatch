@@ -166,40 +166,20 @@ class _WalletScreenState extends State<WalletScreen> {
                       ],
                       border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
                     ),
-                    child: Stack(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Decorative pattern rings
-                        Positioned(
-                          right: -40,
-                          top: -40,
-                          child: Icon(TablerIcons.circle_filled, size: 150, color: Colors.white.withOpacity(0.05)),
-                        ),
-                        Positioned(
-                          right: 20,
-                          top: 40,
-                          child: Icon(TablerIcons.circle, size: 80, color: Colors.white.withOpacity(0.1)),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Available Balance',
-                                  style: TextStyle(fontFamily: 'Inter', color: Colors.white.withOpacity(0.85), fontSize: 14, fontWeight: FontWeight.w500),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(CupertinoIcons.creditcard, color: Colors.white, size: 24),
-                                ),
-                              ],
+                            Text(
+                              'Available Balance',
+                              style: TextStyle(fontFamily: 'Inter', color: Colors.white.withOpacity(0.85), fontSize: 14, fontWeight: FontWeight.w500),
                             ),
-                            const SizedBox(height: 12),
+                            const Icon(CupertinoIcons.creditcard, color: Colors.white, size: 28),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
                             Text(
                               '₦${_walletBalance.toStringAsFixed(2)}',
                               style: const TextStyle(fontFamily: 'IBM Plex Mono', color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800, letterSpacing: -1.0),
@@ -229,8 +209,6 @@ class _WalletScreenState extends State<WalletScreen> {
                             ),
                           ],
                         ),
-                      ],
-                    ),
                   ),
                   
                   const SizedBox(height: 48),
