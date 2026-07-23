@@ -77,3 +77,13 @@ func UpdateRiderStatus(c *gin.Context) {
 
 	c.JSON(http.StatusOK, rider)
 }
+
+func GetRiderProfile(c *gin.Context) {
+	userId := c.Param("userId")
+	var rider database.Rider
+	if err := database.DB.Where("user_id = ?", userId).First(&rider).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Rider not found"})
+		return
+	}
+	c.JSON(http.StatusOK, rider)
+}

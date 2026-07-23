@@ -77,6 +77,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
       });
 
       try {
+        final vehicleStr = _ownBike 
+            ? '${_plateController.text.trim()} - Bajaj Pulsar 150' 
+            : 'NETS Financed';
+
         final response = await http.post(
           Uri.parse('https://nets-logistics-api.onrender.com/auth/register'),
           headers: {'Content-Type': 'application/json'},
@@ -84,7 +88,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
             'name': name,
             'email': email,
             'password': password,
-            'role': 'rider'
+            'role': 'rider',
+            'vehicle': vehicleStr
           }),
         );
 
@@ -93,6 +98,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
             _isLoading = false;
           });
           if (response.statusCode == 200 || response.statusCode == 201) {
+            String userId = '';
+            try {
+              userId = jsonDecode(response.body)['userId'] ?? '';
+            } catch (_) {}
+
              ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 backgroundColor: Colors.green,
@@ -101,7 +111,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
             );
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const VerificationStatusScreen()),
+              MaterialPageRoute(builder: (context) => VerificationStatusScreen(userId: userId)),
             );
           } else {
             String errorMessage = 'Registration failed';

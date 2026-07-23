@@ -1,10 +1,65 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'main_navigation_screen.dart';
 
-class VerificationStatusScreen extends StatelessWidget {
-  const VerificationStatusScreen({super.key});
+class VerificationStatusScreen extends StatefulWidget {
+  final String userId;
+  const VerificationStatusScreen({super.key, this.userId = ''});
+
+  @override
+  State<VerificationStatusScreen> createState() => _VerificationStatusScreenState();
+}
+
+class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
+  Timer? _timer;
+  bool _isActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.userId.isNotEmpty) {
+      _startPolling();
+    }
+  }
+
+  void _startPolling() {
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      try {
+        final response = await http.get(Uri.parse('https://nets-logistics-api.onrender.com/riders/profile/${widget.userId}'));
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          if (data['status'] == 'Active') {
+            timer.cancel();
+            setState(() {
+              _isActive = true;
+            });
+            // Automatically navigate to Main app
+            Future.delayed(const Duration(seconds: 1), () {
+              if (mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+                  (route) => false,
+                );
+              }
+            });
+          }
+        }
+      } catch (e) {
+        debugPrint("Polling error: $e");
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,21 +109,21 @@ class VerificationStatusScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: AppTheme.accentRed.withOpacity(0.08),
+                      color: _isActive ? Colors.green.withOpacity(0.08) : AppTheme.accentRed.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppTheme.accentRed.withOpacity(0.15)),
+                      border: Border.all(color: _isActive ? Colors.green.withOpacity(0.3) : AppTheme.accentRed.withOpacity(0.15)),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(TablerIcons.clock, color: AppTheme.accentRed, size: 24),
+                        Icon(_isActive ? TablerIcons.check : TablerIcons.clock, color: _isActive ? Colors.green : AppTheme.accentRed, size: 24),
                         const SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Application Under Review',
+                                _isActive ? 'Application Approved' : 'Application Under Review',
                                 style: TextStyle(fontFamily: 'Inter', 
                                   fontSize: 14,
                                   fontWeight: FontWeight.w800,
@@ -77,7 +132,9 @@ class VerificationStatusScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Your application is under review. This usually takes 24–48 hours. We will notify you via SMS once approved.',
+                                _isActive 
+                                  ? 'Your account has been activated! Redirecting you to your dashboard...' 
+                                  : 'Your application is under review. This usually takes 24–48 hours. Please wait here or check back later.',
                                 style: TextStyle(fontFamily: 'IBM Plex Mono', 
                                   fontSize: 12,
                                   color: AppTheme.textSecondary,
@@ -116,15 +173,16 @@ class VerificationStatusScreen extends StatelessWidget {
                     index: 2,
                     title: 'Background Verification',
                     subtitle: 'Verifying details against official records',
-                    status: TimelineStatus.active,
+                    status: _isActive ? TimelineStatus.completed : TimelineStatus.active,
                   ),
-                  _buildTimelineLine(false),
+                  _buildTimelineLine(_isActive),
                   _buildTimelineStep(
                     index: 3,
                     title: 'Account Activation',
                     subtitle: 'Get approved and start delivering',
-                    status: TimelineStatus.pending,
+                    status: _isActive ? TimelineStatus.completed : TimelineStatus.pending,
                   ),
+
                   
                   const Spacer(),
                   

@@ -21,6 +21,7 @@ func SetupRouter() *gin.Engine {
 	// Riders
 	r.GET("/riders", handlers.GetRiders)
 	r.PATCH("/riders/:id/status", handlers.UpdateRiderStatus)
+	r.GET("/riders/profile/:userId", handlers.GetRiderProfile)
 
 	// Orders
 	r.GET("/orders", handlers.GetOrders)

@@ -20,6 +20,7 @@ type RegisterRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 	Role     string `json:"role" binding:"required"` // agent, vendor, rider
 	Name     string `json:"name" binding:"required"`
+	Vehicle  string `json:"vehicle"` // Optional, used for riders
 }
 
 type LoginRequest struct {
@@ -80,7 +81,11 @@ func Register(c *gin.Context) {
 			return
 		}
 	case "rider":
-		rider := database.Rider{ID: profileId, UserID: userId, Name: req.Name, Status: "Pending"}
+		vehicle := req.Vehicle
+		if vehicle == "" {
+			vehicle = "NETS Financed"
+		}
+		rider := database.Rider{ID: profileId, UserID: userId, Name: req.Name, Vehicle: vehicle, Status: "Pending"}
 		if err := tx.Create(&rider).Error; err != nil {
 			tx.Rollback()
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create rider profile"})
