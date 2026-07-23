@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide ErrorWidget;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_paystack/src/api/service/contracts/banks_service_contract.dart';
 import 'package:flutter_paystack/src/api/service/contracts/cards_service_contract.dart';
 import 'package:flutter_paystack/src/common/paystack.dart';
@@ -294,7 +295,7 @@ class _CheckoutWidgetState extends BaseState<CheckoutWidget>
     _methodWidgets = [
       new MethodItem(
           text: 'Card',
-          icon: Icons.credit_card,
+          icon: CupertinoIcons.creditcard,
           child: new CardCheckout(
             key: Key("CardCheckout"),
             publicKey: widget.publicKey,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -189,7 +190,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     color: Colors.white.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: const Icon(TablerIcons.wallet, color: Colors.white, size: 20),
+                                  child: const Icon(CupertinoIcons.creditcard, color: Colors.white, size: 24),
                                 ),
                               ],
                             ),
