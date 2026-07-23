@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../theme.dart';
 import '../widgets/custom_bottom_nav.dart';
 import 'notification_settings_screen.dart';
+import 'wallet_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -317,7 +318,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: EdgeInsets.symmetric(vertical: 16),
                           child: Divider(color: Colors.white10, height: 1),
                         ),
-                        _buildActionRow(context, TablerIcons.credit_card, 'Payment Methods', 'Manage your cards and wallet'),
+                        _buildActionRow(
+                          context, 
+                          TablerIcons.credit_card, 
+                          'Payment Methods', 
+                          'Manage your cards and wallet',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const WalletScreen()),
+                            );
+                          },
+                        ),
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
                           child: Divider(color: Colors.white10, height: 1),
