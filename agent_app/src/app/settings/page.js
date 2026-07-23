@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Mail, Smartphone, RefreshCw, ShieldAlert, Tag, ArrowLeft } from "lucide-react";
+import { IconBell, IconMail, IconDeviceMobile, IconRefresh, IconShield, IconTag, IconArrowLeft } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function SettingsPage() {
@@ -92,7 +92,7 @@ export default function SettingsPage() {
         <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard" className="p-2 hover:bg-white/5 rounded-full transition-colors">
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+              <IconArrowLeft className="w-5 h-5 text-gray-400" />
             </Link>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -131,7 +131,7 @@ export default function SettingsPage() {
           <section className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
             <div className="p-6 border-b border-white/5 flex items-center space-x-3">
               <div className="w-10 h-10 rounded-xl bg-azure/10 flex items-center justify-center text-azure">
-                <Bell className="w-5 h-5" />
+                <IconBell className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold">Delivery Methods</h2>
@@ -140,14 +140,14 @@ export default function SettingsPage() {
             </div>
             <div className="p-6 space-y-6">
               <ToggleRow
-                icon={<Smartphone className="w-5 h-5" />}
+                icon={<IconDeviceMobile className="w-5 h-5" />}
                 title="Push Notifications"
                 description="Receive alerts directly on your device"
                 checked={settings.pushEnabled}
                 onChange={() => handleToggle("pushEnabled")}
               />
               <ToggleRow
-                icon={<Mail className="w-5 h-5" />}
+                icon={<IconMail className="w-5 h-5" />}
                 title="Email Notifications"
                 description="Receive daily summaries and critical alerts via email"
                 checked={settings.emailEnabled}
@@ -160,7 +160,7 @@ export default function SettingsPage() {
           <section className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden">
             <div className="p-6 border-b border-white/5 flex items-center space-x-3">
               <div className="w-10 h-10 rounded-xl bg-hazel/10 flex items-center justify-center text-hazel">
-                <ShieldAlert className="w-5 h-5" />
+                <IconShield className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold">Notification Types</h2>
@@ -169,21 +169,21 @@ export default function SettingsPage() {
             </div>
             <div className="p-6 space-y-6">
               <ToggleRow
-                icon={<RefreshCw className="w-5 h-5" />}
+                icon={<IconRefresh className="w-5 h-5" />}
                 title="Order & Delivery Updates"
                 description="Get notified about status changes and assignments"
                 checked={settings.orderUpdates}
                 onChange={() => handleToggle("orderUpdates")}
               />
               <ToggleRow
-                icon={<ShieldAlert className="w-5 h-5" />}
+                icon={<IconShield className="w-5 h-5" />}
                 title="System Alerts"
                 description="Security notices and platform maintenance"
                 checked={settings.systemAlerts}
                 onChange={() => handleToggle("systemAlerts")}
               />
               <ToggleRow
-                icon={<Tag className="w-5 h-5" />}
+                icon={<IconTag className="w-5 h-5" />}
                 title="Promotions & News"
                 description="Platform updates and special offers"
                 checked={settings.promotions}
