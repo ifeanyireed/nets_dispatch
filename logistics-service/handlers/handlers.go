@@ -87,3 +87,32 @@ func GetRiderProfile(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, rider)
 }
+
+func DeleteRider(c *gin.Context) {
+	id := c.Param("id")
+	
+	var rider database.Rider
+	if err := database.DB.Where("id = ?", id).First(&rider).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Rider not found"})
+		return
+	}
+
+	userId := rider.UserID
+
+	// Start transaction to delete both rider and associated user
+	tx := database.DB.Begin()
+	if err := tx.Delete(&rider).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete rider"})
+		return
+	}
+
+	if err := tx.Where("id = ?", userId).Delete(&database.User{}).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete associated user"})
+		return
+	}
+
+	tx.Commit()
+	c.JSON(http.StatusOK, gin.H{"message": "Rider deleted successfully"})
+}

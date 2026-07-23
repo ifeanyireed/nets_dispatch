@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { IconX, IconCheck, IconSearch, IconFilter, IconUserPlus } from "@tabler/icons-react";
+import { IconX, IconCheck, IconSearch, IconFilter, IconUserPlus, IconTrash, IconBan, IconCheck as IconCheckMark } from "@tabler/icons-react";
 
 export default function RidersTable({ initialRiders }) {
   const [riders, setRiders] = useState(initialRiders);
@@ -19,25 +19,43 @@ export default function RidersTable({ initialRiders }) {
     }
   };
 
-  const handleApprove = async () => {
-    if (!selectedRider) return;
-    setIsApproving(true);
+  const updateStatus = async (id, status) => {
     try {
-      const res = await fetch(`https://nets-logistics-api.onrender.com/riders/${selectedRider.id}/status`, {
+      const res = await fetch(`https://nets-logistics-api.onrender.com/riders/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "Active" }),
+        body: JSON.stringify({ status }),
       });
       if (res.ok) {
         const updated = await res.json();
-        setRiders(riders.map(r => r.id === updated.id ? updated : r));
-        setSelectedRider(null);
+        setRiders(riders.map(r => r.id === id ? updated : r));
+        if (selectedRider?.id === id) setSelectedRider(updated);
       }
     } catch (error) {
-      console.error("Failed to approve rider:", error);
-    } finally {
-      setIsApproving(false);
+      console.error("Failed to update rider status:", error);
     }
+  };
+
+  const deleteRider = async (id) => {
+    if (!confirm("Are you sure you want to delete this rider?")) return;
+    try {
+      const res = await fetch(`https://nets-logistics-api.onrender.com/riders/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setRiders(riders.filter(r => r.id !== id));
+        if (selectedRider?.id === id) setSelectedRider(null);
+      }
+    } catch (error) {
+      console.error("Failed to delete rider:", error);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!selectedRider) return;
+    setIsApproving(true);
+    await updateStatus(selectedRider.id, "Active");
+    setIsApproving(false);
   };
 
   const filteredRiders = riders.filter(r => {
@@ -70,12 +88,13 @@ export default function RidersTable({ initialRiders }) {
                 <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-widest text-text-2 font-normal">Status</th>
                 <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-widest text-text-2 font-normal">Rating</th>
                 <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-widest text-text-2 font-normal text-right">Deliveries</th>
+                <th className="px-6 py-4 font-mono text-[10px] uppercase tracking-widest text-text-2 font-normal text-right">Action</th>
               </tr>
             </thead>
             <tbody className="font-sans text-sm divide-y divide-hairline">
               {filteredRiders.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-text-2 font-mono text-sm">
+                  <td colSpan="6" className="px-6 py-8 text-center text-text-2 font-mono text-sm">
                     No riders found.
                   </td>
                 </tr>
@@ -98,6 +117,35 @@ export default function RidersTable({ initialRiders }) {
                   </td>
                   <td className="px-6 py-4 text-text-0 font-mono font-semibold">{rider.rating ?? '0.0'} <span className="text-hazard">★</span></td>
                   <td className="px-6 py-4 text-right font-mono font-semibold text-text-0">{rider.deliveries ?? 0}</td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                      {rider.status !== 'Active' && (
+                        <button 
+                          onClick={() => updateStatus(rider.id, "Active")} 
+                          className="p-1.5 rounded-md hover:bg-live/20 text-live transition-colors" 
+                          title="Approve / Activate"
+                        >
+                          <IconCheckMark size={16} />
+                        </button>
+                      )}
+                      {rider.status !== 'Suspended' && (
+                        <button 
+                          onClick={() => updateStatus(rider.id, "Suspended")} 
+                          className="p-1.5 rounded-md hover:bg-[#f59e0b]/20 text-[#f59e0b] transition-colors" 
+                          title="Suspend"
+                        >
+                          <IconBan size={16} />
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => deleteRider(rider.id)} 
+                        className="p-1.5 rounded-md hover:bg-hazard/20 text-hazard transition-colors" 
+                        title="Delete"
+                      >
+                        <IconTrash size={16} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
