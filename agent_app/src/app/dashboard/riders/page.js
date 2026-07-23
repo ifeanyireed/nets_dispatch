@@ -1,12 +1,24 @@
 import { IconSearch, IconFilter, IconPlus, IconUserPlus } from "@tabler/icons-react";
 
-export default function Riders() {
-  const riders = [
-    { name: "Ade Ogundele", vehicle: "Bike", status: "Active", rating: "4.9", deliveries: "1,204", statusColor: "text-live bg-live/10 border border-live/20" },
-    { name: "Chidi Okafor", vehicle: "Bike", status: "Busy", rating: "4.7", deliveries: "988", statusColor: "text-hazard bg-hazard/10 border border-hazard/20" },
-    { name: "Musa Bello", vehicle: "Bike", status: "Offline", rating: "4.6", deliveries: "742", statusColor: "text-text-1 bg-text-2/10 border border-hairline-2" },
-    { name: "Emeka Obi", vehicle: "Van", status: "Suspended", rating: "3.2", deliveries: "124", statusColor: "text-alert bg-alert/10 border border-alert/20" },
-  ];
+export default async function Riders() {
+  let riders = [];
+  try {
+    const res = await fetch("https://nets-logistics-api.onrender.com/riders", { cache: "no-store" });
+    if (res.ok) {
+      riders = await res.json();
+    }
+  } catch (error) {
+    console.error("Failed to fetch riders:", error);
+  }
+
+  const getStatusColor = (status) => {
+    switch(status?.toLowerCase()) {
+      case 'active': return "text-live bg-live/10 border border-live/20";
+      case 'busy': return "text-hazard bg-hazard/10 border border-hazard/20";
+      case 'suspended': return "text-alert bg-alert/10 border border-alert/20";
+      default: return "text-text-1 bg-text-2/10 border border-hairline-2"; // offline
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
@@ -65,24 +77,31 @@ export default function Riders() {
                 </tr>
               </thead>
               <tbody className="font-sans text-sm divide-y divide-hairline">
+                {riders.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-text-2 font-mono text-sm">
+                      No riders found.
+                    </td>
+                  </tr>
+                )}
                 {riders.map((rider, idx) => (
                   <tr key={idx} className="hover:bg-panel-2/50 transition-colors cursor-pointer group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-panel-2 border border-hairline flex items-center justify-center font-bold text-text-0 font-sans text-xs">
-                          {rider.name.charAt(0)}
+                          {rider.name ? rider.name.charAt(0).toUpperCase() : '?'}
                         </div>
-                        <span className="font-semibold text-text-0 group-hover:text-hazard transition-colors">{rider.name}</span>
+                        <span className="font-semibold text-text-0 group-hover:text-hazard transition-colors">{rider.name || 'Unknown'}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-text-1">{rider.vehicle}</td>
+                    <td className="px-6 py-4 text-text-1">{rider.vehicle || 'N/A'}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${rider.statusColor}`}>
-                        {rider.status}
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(rider.status)}`}>
+                        {rider.status || 'Offline'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-text-0 font-mono font-semibold">{rider.rating} <span className="text-hazard">★</span></td>
-                    <td className="px-6 py-4 text-right font-mono font-semibold text-text-0">{rider.deliveries}</td>
+                    <td className="px-6 py-4 text-text-0 font-mono font-semibold">{rider.rating ?? '0.0'} <span className="text-hazard">★</span></td>
+                    <td className="px-6 py-4 text-right font-mono font-semibold text-text-0">{rider.deliveries ?? 0}</td>
                   </tr>
                 ))}
               </tbody>
@@ -90,7 +109,7 @@ export default function Riders() {
           </div>
           
           <div className="p-4 border-t border-hairline flex items-center justify-between text-xs font-mono text-text-2">
-            <span>Showing 4 of 214 riders</span>
+            <span>Showing {riders.length} riders</span>
             <div className="flex gap-2">
               <button className="px-3 py-1 rounded-full border border-hairline hover:text-text-0 transition-colors">Prev</button>
               <button className="px-3 py-1 rounded-full border border-hairline hover:text-text-0 transition-colors">Next</button>
