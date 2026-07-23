@@ -33,13 +33,27 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
   }
 
   Future<void> _checkStatus() async {
-    if (widget.userId == null || widget.userId!.isEmpty) return;
+    if (widget.userId == null || widget.userId!.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error: Missing User ID. Please log in or register again.'), backgroundColor: Colors.red),
+        );
+      }
+      return;
+    }
     
     try {
       final response = await http.get(Uri.parse('https://nets-logistics-api.onrender.com/riders/profile/${widget.userId!.trim()}'));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final status = data['status']?.toString().toLowerCase();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Status check: ${data['status']}'), duration: const Duration(seconds: 2)),
+          );
+        }
+
         if (status == 'active') {
           _timer?.cancel();
           if (mounted) {
@@ -57,6 +71,12 @@ class _VerificationStatusScreenState extends State<VerificationStatusScreen> {
               }
             });
           }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${response.statusCode} - ${response.body}'), backgroundColor: Colors.red),
+          );
         }
       }
     } catch (e) {
