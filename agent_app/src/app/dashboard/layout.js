@@ -12,11 +12,22 @@ import {
   IconTruck, IconTruckFilled,
   IconReceipt, IconReceiptFilled,
   IconReportAnalytics, IconReportAnalyticsFilled,
-  IconSearch 
+  IconSearch, IconChevronRight
 } from "@tabler/icons-react";
+import { useState, useEffect } from "react";
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
+  const [profileName, setProfileName] = useState("Agent");
+
+  useEffect(() => {
+    const p = localStorage.getItem("profile");
+    if (p) {
+      try {
+        setProfileName(JSON.parse(p).name || "Agent");
+      } catch (e) {}
+    }
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-ink relative">
@@ -88,15 +99,15 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         {/* Footer */}
-        <Link href="/profile" className="mt-auto pt-4 border-t border-hairline font-sans tracking-wide text-sm text-text-2 leading-relaxed block hover:bg-panel transition-colors rounded-xl px-2 py-2">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-full bg-panel border border-hairline-2 flex items-center justify-center text-text-0 font-bold">AO</div>
-            <div className="flex flex-col">
-              <span className="text-text-0 font-bold">Ade O.</span>
-              <span className="text-[8px]">Dispatcher</span>
-            </div>
+        <Link href="/profile" className="mt-auto p-3 border border-hairline bg-panel-2/30 backdrop-blur-md rounded-2xl flex items-center gap-3 hover:bg-panel transition-all group cursor-pointer shadow-sm">
+          <div className="w-10 h-10 rounded-full border border-hazard/30 group-hover:border-hazard/60 transition-colors overflow-hidden relative shadow-[0_2px_10px_-2px_rgba(239,68,68,0.2)] bg-ink">
+            <Image src="/images/biker11.jpeg" alt="Agent Avatar" fill className="object-cover" />
           </div>
-          <div>Agent Session <span className="text-live">● Active</span></div>
+          <div className="flex flex-col flex-1 min-w-0">
+            <span className="text-text-0 font-extrabold text-sm truncate group-hover:text-hazard transition-colors">{profileName}</span>
+            <span className="text-[9px] text-text-2 uppercase tracking-[0.1em] font-bold mt-0.5">Dispatcher HQ</span>
+          </div>
+          <IconChevronRight size={16} className="text-text-2 group-hover:text-hazard transition-colors flex-none" />
         </Link>
       </aside>
 
