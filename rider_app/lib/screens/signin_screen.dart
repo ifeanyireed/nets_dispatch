@@ -77,6 +77,7 @@ class _SignInScreenState extends State<SignInScreen> {
           }
           if (data['user'] != null) {
             if (data['user']['email'] != null) await prefs.setString('email', data['user']['email']);
+            if (data['user']['avatarUrl'] != null) await prefs.setString('avatarUrl', data['user']['avatarUrl']);
           }
 
           ScaffoldMessenger.of(context).showSnackBar(

@@ -79,6 +79,8 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         if (data['user'] != null) {
           if (data['user']['email'] != null) await prefs.setString('email', data['user']['email']);
+          if (data['user']['id'] != null) await prefs.setString('userId', data['user']['id'].toString());
+          if (data['user']['avatarUrl'] != null) await prefs.setString('avatarUrl', data['user']['avatarUrl']);
         }
         
         Navigator.pushReplacementNamed(context, '/home');
