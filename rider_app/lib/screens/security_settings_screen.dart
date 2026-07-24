@@ -208,6 +208,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -277,7 +278,6 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
             inactiveTrackColor: Colors.grey.shade800,
           ),
         ],
-      ),
       ),
     );
   }

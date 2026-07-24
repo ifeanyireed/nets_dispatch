@@ -480,6 +480,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -567,7 +568,6 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
             const Icon(TablerIcons.chevron_right, color: AppTheme.textSecondary, size: 18),
           ],
         ),
-      ),
       ),
     );
   }

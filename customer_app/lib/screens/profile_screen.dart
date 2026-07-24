@@ -482,6 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -569,7 +570,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const Icon(TablerIcons.chevron_right, color: AppTheme.textSecondary, size: 18),
           ],
         ),
-      ),
       ),
     );
   }

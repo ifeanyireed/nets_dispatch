@@ -391,6 +391,7 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -453,7 +454,6 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
           ),
         ],
-      ),
       ),
     );
   }

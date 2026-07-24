@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
           }
         `}} />
       </head>
-      <body className="bg-ink text-text-0 min-h-screen flex flex-col font-sans">
+      <body className="bg-ink text-text-0 min-h-screen flex flex-col font-sans" suppressHydrationWarning>
         {children}
       </body>
     </html>

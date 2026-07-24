@@ -127,12 +127,6 @@ export default function Profile() {
           </div>
           <div className="flex items-center gap-3 hidden md:flex">
             <button 
-              onClick={() => router.push('/settings')} 
-              className="flex items-center justify-center px-6 py-2.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:text-white transition-all text-gray-300 font-bold text-xs tracking-widest uppercase"
-            >
-              Settings
-            </button>
-            <button 
               onClick={handleLogout} 
               className="flex items-center justify-center px-6 py-2.5 rounded-full border border-hazard/30 bg-hazard/10 hover:bg-hazard hover:text-white hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all text-hazard font-bold text-xs tracking-widest uppercase"
             >
@@ -252,7 +246,7 @@ export default function Profile() {
                   <IconChevronRight size={20} className="text-text-2 group-hover:text-hazard transition-colors" />
                 </button>
 
-                <button className="flex items-center text-left group p-3 hover:bg-panel-2 rounded-2xl transition-all">
+                <button onClick={() => router.push('/settings')} className="flex items-center text-left group p-3 hover:bg-panel-2 rounded-2xl transition-all w-full">
                   <div className="w-12 h-12 bg-ink rounded-xl border border-hairline flex items-center justify-center group-hover:border-live/30 group-hover:text-live transition-all text-text-1 shadow-sm">
                     <IconBell size={24} />
                   </div>
